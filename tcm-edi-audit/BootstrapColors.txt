@@ -1,0 +1,40 @@
+﻿Success	
+Normal	25; 135; 84
+Hover	21; 115; 71
+Pressed	20; 108; 67
+
+	
+Primary	
+Normal	13; 110; 253
+Hover	11; 94; 215
+Pressed	10; 88; 202
+
+	
+Danger	
+Normal	220; 53; 69
+Hover	187; 45; 59
+Pressed	176; 42; 55
+
+	
+Secondary	
+Normal	108; 117; 125
+Hover	92; 99; 106
+Pressed	86; 94; 100
+
+	
+Warning	
+Normal	255; 193; 7
+Hover	255; 202; 44
+Pressed	255; 205; 57
+
+	
+Info	
+Normal	13; 202; 240
+Hover	49; 210; 242
+Pressed	61; 213; 243
+
+	
+Light	
+Normal	248; 249; 250
+Hover	211; 212; 213
+Pressed	198; 199; 200
