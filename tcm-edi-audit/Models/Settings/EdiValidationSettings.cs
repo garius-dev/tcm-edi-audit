@@ -76,23 +76,18 @@ namespace tcm_edi_audit.Models.Settings
         {
             int idx = 7;
 
+            var requestNumbers = excelRecordGroup.Records.GroupBy(g => g.RequestCode).Select(s => s.Key).ToList();
+
             if (columns.Count > idx)
             {
                 string collectRequestCode = columns[idx].Content;
 
                 bool isBinaryText = collectRequestCode.All(c => c == '0' || c == '1');
 
-                if (isBinaryText)
+                if (collectRequestCode != requestNumbers.First() || (isBinaryText && collectRequestCode != "000001"))
                 {
-                    if (collectRequestCode != "000001")
-                    {
-                        columns[idx].IsValidated = false;
-                        columns[idx].Error = "Código de solicitação de coleta inválido (qtd. de zeros)";
-                    }
-                }
-                else
-                {
-
+                    columns[idx].IsValidated = false;
+                    columns[idx].Error = "Código de solicitação de coleta inválido (qtd. de zeros)";
                 }
 
             }
@@ -107,27 +102,6 @@ namespace tcm_edi_audit.Models.Settings
             {
                 columns[idx_a].IsValidated = false;
                 columns[idx_a].Error = $"Valor total do documento não bate com a planilha, valor esperado {textTotalAmount}, obtido: {columns[idx_a].Content}";
-            }
-        }
-
-        public static void ValidateKnowledgeNumber(List<EdiColumn> columns322, List<EdiColumn> columns329, AppSettings settings, ExcelRecordGroup excelRecordGroup)
-        {
-            int idx_a = 3; //322 - cod filial
-            int idx_b = 12; //329 - ND
-
-            if (columns322.Count > idx_a && columns329.Count > idx_b)
-            {
-                string knowledgeNumber322 = columns322[idx_a].Content;
-                string knowledgeNumber329 = columns329[idx_b].Content;
-
-
-                if (!knowledgeNumber329.StartsWith(knowledgeNumber322))
-                {
-                    columns322[idx_a].IsValidated = false;
-                    columns322[idx_a].Error = "Número do conhecimento não bate com a linha 329";
-                    columns329[idx_b].IsValidated = false;
-                    columns329[idx_b].Error = "Número do conhecimento não bate com a linha 322";
-                }
             }
         }
 
@@ -198,9 +172,6 @@ namespace tcm_edi_audit.Models.Settings
 
 
         public int ExpectedCharCount { get; set; } = 0;
-        //public bool IsNumber { get; set; } = false;
-        //public string StartWith { get; set; } = string.Empty;
-        //public string EndWith { get; set; } = string.Empty;
         public string AllowedText { get; set; } = string.Empty;
         public string AllowedFormat { get; set; } = string.Empty;
         public string AllowedRegex { get; set; } = string.Empty;
@@ -253,11 +224,7 @@ namespace tcm_edi_audit.Models.Settings
                 result.errors.Add($"Expected character count for '{this.FieldName}' is {this.ExpectedCharCount}, but got {text.Length}.");
             }
 
-            //if (this.IsNumber && !decimal.TryParse(text, out _))
-            //{
-            //    result.Success = false;
-            //    result.errors.Add($"Field '{this.FieldName}' should be a number, but got '{text}'.");
-            //}
+
 
             if (this.FieldType?.Trim() == "C")
             {
@@ -273,17 +240,6 @@ namespace tcm_edi_audit.Models.Settings
                 }
             }
 
-            //if (this.StartWith?.Length > 0 && !text.StartsWith(this.StartWith))
-            //{
-            //    result.Success = false;
-            //    result.errors.Add($"Field '{this.FieldName}' should start with '{this.StartWith}', but got '{text}'.");
-            //}
-
-            //if (this.EndWith?.Length > 0 && !text.EndsWith(this.EndWith))
-            //{
-            //    result.Success = false;
-            //    result.errors.Add($"Field '{this.FieldName}' should end with '{this.EndWith}', but got '{text}'.");
-            //}
 
             if (this.AllowedText?.Length > 0)
             {

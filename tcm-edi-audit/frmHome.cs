@@ -1,25 +1,19 @@
 ﻿using Newtonsoft.Json;
-using Newtonsoft.Json;
+
 using System;
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using System.Threading.Tasks;
+
 using System.Windows.Forms;
 using tcm_edi_audit.Models.Settings;
 using tcm_edi_audit.Services;
 using tcm_edi_audit.Services.Settings;
-
 
 namespace tcm_edi_audit
 {
@@ -33,7 +27,7 @@ namespace tcm_edi_audit
             InitializeComponent();
         }
 
-        int? ProximoIndice<T>(List<T> lista, int fromIndex, Func<T, bool> predicate)
+        private int? ProximoIndice<T>(List<T> lista, int fromIndex, Func<T, bool> predicate)
         {
             return lista
                 .Skip(fromIndex + 1)
@@ -46,7 +40,6 @@ namespace tcm_edi_audit
             string[] rulesCode = new string[] { "000", "320", "321", "322", "329", "323" };
 
             List<(string line, int start, int end)> linesToProcess = new List<(string, int, int)>();
-
 
             for (int i = 0; i < ediLines.Length; i++)
             {
@@ -65,7 +58,6 @@ namespace tcm_edi_audit
 
             foreach (var line in linesToProcess)
             {
-
                 var sublista = ediLines.ToList().GetRange(line.start, line.end - line.start + 1).Where(w => !string.IsNullOrEmpty(w.Trim())).ToList();
                 int columnId = 0;
 
@@ -98,7 +90,6 @@ namespace tcm_edi_audit
                     columnId++;
                 }
             }
-
 
             return JsonConvert.SerializeObject(ediFieldValidationSettings, Formatting.Indented);
         }
@@ -134,7 +125,6 @@ namespace tcm_edi_audit
 
                     //    //}
 
-
                     //    var parser = new EdiParser(_settings);
                     //    parser.Parse(ediLines);
                     //}
@@ -148,14 +138,12 @@ namespace tcm_edi_audit
 
         private async void frmHome_Load(object sender, EventArgs e)
         {
-
             _settings = ConfigManager.LoadSettings();
 
             _systemSettings = SystemConfigManager.LoadSettings();
 
             txtFolderPath.Text = _systemSettings.FolderPath;
             txtExcelPath.Text = _systemSettings.ExcelPath;
-
         }
 
         public async Task<string> ObterIdTokenAnonimoAsync(string apiKey)
@@ -197,12 +185,10 @@ namespace tcm_edi_audit
 
         private void btnSelectFolderPath_Click(object sender, EventArgs e)
         {
-
         }
 
         private void btnSelectExcelPath_Click(object sender, EventArgs e)
         {
-
         }
 
         private void txtFolderPath_Click(object sender, EventArgs e)
@@ -276,8 +262,6 @@ namespace tcm_edi_audit
                         foreach (var invoiceItem in invoiceGroup)
                         {
 
-                            //var textTomalAmount = invoiceItem.TotalAmount.ToString("F2").Replace(".", string.Empty).Replace(",", string.Empty);
-
                             var ediFiles = Directory.GetFiles(txtFolderPath.Text, "*.txt")
                                 .Where(f => Path.GetFileNameWithoutExtension(f).EndsWith($"_{invoiceItem.InvoiceNumber}"))
                                 .ToList();
@@ -292,6 +276,7 @@ namespace tcm_edi_audit
                             }
                             else
                             {
+                                MessageBox.Show($"Excel não retornou nenhuma linha", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
                             }
                         }
@@ -299,13 +284,11 @@ namespace tcm_edi_audit
                     else
                     {
                         MessageBox.Show($"Excel não retornou nenhuma linha", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
-
                     }
                 }
                 else
                 {
                     MessageBox.Show($"Pasta raiz ou arquivo excel não existe", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
-
                 }
             }
             else

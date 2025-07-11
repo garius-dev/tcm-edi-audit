@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -33,10 +34,15 @@ namespace tcm_edi_audit.Models.Settings
         public static List<TransportRecord> ReadExcelFile(string filePath)
         {
             var records = new List<TransportRecord>();
-            using (var workbook = new XLWorkbook(filePath))
+
+            // Copia para um arquivo temporário
+            string tempPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + Path.GetExtension(filePath));
+            File.Copy(filePath, tempPath, true);
+
+            using (var workbook = new XLWorkbook(tempPath))
             {
                 var worksheet = workbook.Worksheets.First();
-                var rows = worksheet.RangeUsed().RowsUsed().Skip(1); // skip header
+                var rows = worksheet.RangeUsed().RowsUsed().Skip(1); // pula o cabeçalho
 
                 foreach (var row in rows)
                 {
@@ -61,8 +67,12 @@ namespace tcm_edi_audit.Models.Settings
                 }
             }
 
+            // Remove o temporário após o uso (opcional, mas recomendado)
+            try { File.Delete(tempPath); } catch { /* ignora erro de exclusão */ }
+
             return records;
         }
+
 
         public static decimal ParseCurrency(string input)
         {
