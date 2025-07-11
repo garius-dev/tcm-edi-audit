@@ -135,6 +135,8 @@
   <ItemGroup>
     <Compile Include="Extensions\EdiObjectExtensions.cs" />
     <Compile Include="Extensions\ListExtensions.cs" />
+    <Compile Include="Extensions\MathExtensions.cs" />
+    <Compile Include="Extensions\TextExtensions.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>

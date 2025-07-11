@@ -72,23 +72,23 @@ namespace tcm_edi_audit.Services
 
             }
 
-            //if (excelRecordGroup != null)
-            //{
-            //    var totalAmount = Math.Truncate(excelRecordGroup.TotalRevenue * 100) / 100;
-            //    var textTotalAmount = totalAmount.ToString("F2")
-            //        .Replace(".", string.Empty).Replace(",", string.Empty);
+            var lines323 = ediLines.GetEdiLinesByCode("323");
 
-            //    var line323 = ediLines.GetEdiLinesByCode("323").SelectMany(s => s.Columns).ToList();
-            //    if (!line323.IsNullOrEmpty())
-            //    {
-            //        EdiFieldValidationExtensions.ValidateTotalAmount(line323, textTotalAmount, excelRecordGroup);
-            //        bool line323HasErrors = line323.Any(w => !w.IsValidated);
-            //        if (line323HasErrors)
-            //        {
-            //            ediLines.Where(w => w.LineCode == "323").ToList().ForEach(f => f.HasErrors = true);
-            //        }
-            //    }
-            //}
+            if (!lines323.IsNullOrEmpty())
+            {
+                foreach(var line323 in lines323)
+                {
+                    var columns323 = line323.Columns;
+                    var textTotalAmount = excelRecordGroup.TotalRevenue.TruncDecimal().ToEdiTotalValueText();
+                    if (!columns323[2].Content.EndsWith(textTotalAmount))
+                    {
+                        columns323[2].IsValidated = true;
+                        columns323[2].Error = $"Valor total do documento não bate com a planilha, valor esperado {textTotalAmount}";
+                        line323.HasErrors = true;
+                    }
+                }
+            }
+
 
             var linesWithErros = ediLines.Where(w => w.HasErrors).ToList();
             if (linesWithErros != null && linesWithErros.Any())
