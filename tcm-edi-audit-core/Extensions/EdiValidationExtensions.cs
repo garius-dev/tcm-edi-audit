@@ -36,7 +36,7 @@ namespace tcm_edi_audit_core.Extensions
                     StatusIcon = s.StatusIcon,
                     FileName = s.File?.Name ?? "",
                     Message = s.Status == EdiValidationStatus.Success ?
-                "Sucesso!" : s.Status == EdiValidationStatus.Warning ? "Arquivo corrigido." : "Erro (expanda a seleção para mais detalhes)",
+                "Sucesso!" : s.Status == EdiValidationStatus.Warning ? "Arquivo corrigido (expanda a seleção para mais detalhes)." : "Erro (expanda a seleção para mais detalhes).",
                     Protocol = s.Protocol
                 }).OrderByPriority();
 

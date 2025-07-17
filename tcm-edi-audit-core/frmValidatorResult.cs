@@ -160,95 +160,80 @@ namespace tcm_edi_audit_core
 
         private void SaveFiles()
         {
-            //if (!_resultsConsolidatedDGV.IsNullOrEmpty())
-            //{
+            if (!_validationDisplayItems.IsNullOrEmpty())
+            {
+                var protocolGroup = _validationResults.GroupBy(g => g.Protocol)
+                    .Select(s => new
+                    {
+                        Protocol = s.Key,
+                        Items = s.ToList()
+                    }).ToList();
 
-            //    var protocolGroup = _resultsConsolidatedDGV.GroupBy(g => new { g.ProtocolReference })
-            //        .Select(s => new
-            //        {
-            //            Protocol = s.Key.ProtocolReference,
-            //            Items = s.ToList()
-            //        }).ToList();
+                string dateString = DateTime.Now.ToString("yyyy-MM-dd");
 
-            //    string dateString = DateTime.Now.ToString("yyyy-MM-dd");
+                foreach (var protocolItem in protocolGroup)
+                {
+                    string outputResultFolderPath = Path.Combine(_localSettings.OutputFolderPath, dateString, protocolItem.Protocol);
+                    FileExtensions.CheckOrCreateFolder(outputResultFolderPath);
 
-            //    foreach (var protocolItem in protocolGroup)
-            //    {
-            //        var statusGroup = protocolItem.Items.GroupBy(g => new { g.Status })
-            //            .Select(s => new
-            //            {
-            //                Status = s.Key.Status,
-            //                Items = s.ToList()
-            //            }).ToList();
+                    foreach (var item in protocolItem.Items)
+                    {
+                        if (item.Status == EdiValidationStatus.Warning && item.File != null)
+                        {
+                            var fixedFileContent = item.EdiLines.ToStringBuild();
+                            string fixedFilePath = Path.Combine(outputResultFolderPath, item.File.Name);
 
-            //        foreach (var statusItem in statusGroup)
-            //        {
+                            FileExtensions.CreateOrReplaceFile(fixedFilePath, fixedFileContent);
+                        }
+                        else if (item.Status == EdiValidationStatus.Success && item.File != null)
+                        {
+                            FileExtensions.CopyFileReplacingIfExists(item.File.FullName, outputResultFolderPath);
+                        }
+                        else if (item.Status == EdiValidationStatus.Error && item.File != null)
+                        {
+                            FileExtensions.DeleteFileIfExists(Path.Combine(outputResultFolderPath, item.File.Name));
+                        }
+                    }
 
-            //            foreach (var item in statusItem.Items)
-            //            {
-            //                var folderNew = Path.Combine(_settings.OutputFolderPath, dateString, item.ProtocolReference);
-            //                FileExtensions.CheckOrCreateFolder(folderNew);
-
-            //                if (item.Status.StartsWith("2"))
-            //                {
-            //                    var fixedFile = item.EdiLines.ToStringBuild();
-            //                    FileExtensions.CreateOrReplaceFile(Path.Combine(folderNew, item.FileName), fixedFile);
-
-            //                }
-            //                else if (item.Status.StartsWith("1"))
-            //                {
-            //                    FileExtensions.CopyFileReplacingIfExists(item.FileNameFull, folderNew);
-            //                }
-            //                else
-            //                {
-            //                    FileExtensions.DeleteFileIfExists(Path.Combine(folderNew, item.FileName));
-            //                }
-            //            }
-            //        }
-            //    }
-            //}
+                }
+            }
+            else
+            {
+                MessageBox.Show("Não há arquivos para salvar.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
         }
 
         private async void button4_Click(object sender, EventArgs e)
         {
-            //this.Invoke((MethodInvoker)(() =>
-            //{
-            //    button4.Enabled = false;
-            //    button4.Text = "Salvando...";
-            //    pcbLoading.Visible = true;
-            //}));
+            this.Invoke((MethodInvoker)(() =>
+            {
+                button4.Enabled = false;
+                button4.Text = "Salvando...";
+                pcbLoading.Visible = true;
+            }));
 
-            //await Task.Delay(1);
+            await Task.Delay(1);
 
-            //try
-            //{
-            //    await Task.Run(() => SaveFiles());
+            try
+            {
+                await Task.Run(() => SaveFiles());
+                MessageBox.Show("Arquivos salvos com sucesso!", "Sucesso", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-
-            //    this.Invoke((MethodInvoker)(() =>
-            //    {
-            //        button4.Text = "SALVAR";
-            //        button4.Enabled = true;
-            //        pcbLoading.Visible = false;
-            //    }));
-
-            //    MessageBox.Show("Arquivos salvos com sucesso!", "Sucesso", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-
-            //}
-            //catch (Exception ex)
-            //{
-            //    MessageBox.Show($"Erro: {ex.Message}");
-            //}
-            //finally
-            //{
-            //    this.Invoke((MethodInvoker)(() =>
-            //    {
-            //        button4.Text = "SALVAR";
-            //        button4.Enabled = true;
-            //        pcbLoading.Visible = false;
-            //    }));
-            //}
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erro: {ex.Message}");
+            }
+            finally
+            {
+                this.Invoke((MethodInvoker)(() =>
+                {
+                    button4.Text = "SALVAR";
+                    button4.Enabled = true;
+                    pcbLoading.Visible = false;
+                }));
+            }
         }
 
         private void ckbExpandSelection_CheckedChanged(object sender, EventArgs e)
