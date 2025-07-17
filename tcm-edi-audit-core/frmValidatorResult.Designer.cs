@@ -29,7 +29,6 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmValidatorResult));
-            dataGridView1 = new DataGridView();
             panel8 = new Panel();
             button4 = new ReaLTaiizor.Controls.Button();
             pcbLoading = new PictureBox();
@@ -39,27 +38,18 @@
             panel10 = new Panel();
             comboBox1 = new ComboBox();
             label9 = new Label();
+            panel2 = new Panel();
+            ckbExpandSelection = new ReaLTaiizor.Controls.MaterialCheckBox();
             panel1 = new Panel();
-            ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
+            dataGridView1 = new DataGridView();
             panel8.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pcbLoading).BeginInit();
             panel11.SuspendLayout();
             panel10.SuspendLayout();
+            panel2.SuspendLayout();
             panel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
             SuspendLayout();
-            // 
-            // dataGridView1
-            // 
-            dataGridView1.AllowUserToAddRows = false;
-            dataGridView1.AllowUserToDeleteRows = false;
-            dataGridView1.AllowUserToResizeRows = false;
-            dataGridView1.BorderStyle = BorderStyle.None;
-            dataGridView1.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridView1.Dock = DockStyle.Fill;
-            dataGridView1.Location = new Point(8, 8);
-            dataGridView1.Name = "dataGridView1";
-            dataGridView1.Size = new Size(768, 346);
-            dataGridView1.TabIndex = 0;
             // 
             // panel8
             // 
@@ -72,7 +62,7 @@
             panel8.Margin = new Padding(0);
             panel8.Name = "panel8";
             panel8.Padding = new Padding(8, 8, 8, 0);
-            panel8.Size = new Size(784, 72);
+            panel8.Size = new Size(837, 72);
             panel8.TabIndex = 1;
             // 
             // button4
@@ -87,7 +77,7 @@
             button4.Image = null;
             button4.ImageAlign = ContentAlignment.MiddleLeft;
             button4.InactiveColor = Color.FromArgb(40, 167, 69);
-            button4.Location = new Point(653, 37);
+            button4.Location = new Point(706, 37);
             button4.Name = "button4";
             button4.PressedBorderColor = Color.FromArgb(28, 116, 48);
             button4.PressedColor = Color.FromArgb(30, 126, 52);
@@ -101,7 +91,7 @@
             // 
             pcbLoading.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             pcbLoading.Image = Properties.Resources.loading_35;
-            pcbLoading.Location = new Point(549, 39);
+            pcbLoading.Location = new Point(602, 39);
             pcbLoading.Name = "pcbLoading";
             pcbLoading.Size = new Size(168, 25);
             pcbLoading.SizeMode = PictureBoxSizeMode.Zoom;
@@ -181,6 +171,35 @@
             label9.TabIndex = 2;
             label9.Text = "Status:";
             // 
+            // panel2
+            // 
+            panel2.Controls.Add(ckbExpandSelection);
+            panel2.Dock = DockStyle.Bottom;
+            panel2.Location = new Point(8, 430);
+            panel2.Name = "panel2";
+            panel2.Padding = new Padding(8);
+            panel2.Size = new Size(837, 51);
+            panel2.TabIndex = 3;
+            // 
+            // ckbExpandSelection
+            // 
+            ckbExpandSelection.AutoSize = true;
+            ckbExpandSelection.Depth = 0;
+            ckbExpandSelection.Dock = DockStyle.Left;
+            ckbExpandSelection.Location = new Point(8, 8);
+            ckbExpandSelection.Margin = new Padding(0);
+            ckbExpandSelection.MouseLocation = new Point(-1, -1);
+            ckbExpandSelection.MouseState = ReaLTaiizor.Helper.MaterialDrawHelper.MaterialMouseState.HOVER;
+            ckbExpandSelection.Name = "ckbExpandSelection";
+            ckbExpandSelection.ReadOnly = false;
+            ckbExpandSelection.Ripple = true;
+            ckbExpandSelection.Size = new Size(155, 35);
+            ckbExpandSelection.TabIndex = 15;
+            ckbExpandSelection.Text = "Expandir seleção";
+            ckbExpandSelection.UseAccentColor = false;
+            ckbExpandSelection.UseVisualStyleBackColor = true;
+            ckbExpandSelection.CheckedChanged += ckbExpandSelection_CheckedChanged;
+            // 
             // panel1
             // 
             panel1.Controls.Add(dataGridView1);
@@ -188,16 +207,30 @@
             panel1.Location = new Point(8, 80);
             panel1.Name = "panel1";
             panel1.Padding = new Padding(8);
-            panel1.Size = new Size(784, 362);
-            panel1.TabIndex = 2;
+            panel1.Size = new Size(837, 350);
+            panel1.TabIndex = 4;
+            // 
+            // dataGridView1
+            // 
+            dataGridView1.AllowUserToAddRows = false;
+            dataGridView1.AllowUserToDeleteRows = false;
+            dataGridView1.AllowUserToResizeRows = false;
+            dataGridView1.BorderStyle = BorderStyle.None;
+            dataGridView1.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dataGridView1.Dock = DockStyle.Fill;
+            dataGridView1.Location = new Point(8, 8);
+            dataGridView1.Name = "dataGridView1";
+            dataGridView1.Size = new Size(821, 334);
+            dataGridView1.TabIndex = 0;
             // 
             // frmValidatorResult
             // 
             AutoScaleDimensions = new SizeF(96F, 96F);
             AutoScaleMode = AutoScaleMode.Dpi;
             BackColor = Color.White;
-            ClientSize = new Size(800, 450);
+            ClientSize = new Size(853, 489);
             Controls.Add(panel1);
+            Controls.Add(panel2);
             Controls.Add(panel8);
             Icon = (Icon)resources.GetObject("$this.Icon");
             Name = "frmValidatorResult";
@@ -205,20 +238,20 @@
             StartPosition = FormStartPosition.CenterScreen;
             Text = "EDI AUDIT - Resultados";
             Load += frmValidatorResult_Load;
-            ((System.ComponentModel.ISupportInitialize)dataGridView1).EndInit();
             panel8.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)pcbLoading).EndInit();
             panel11.ResumeLayout(false);
             panel11.PerformLayout();
             panel10.ResumeLayout(false);
             panel10.PerformLayout();
+            panel2.ResumeLayout(false);
+            panel2.PerformLayout();
             panel1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)dataGridView1).EndInit();
             ResumeLayout(false);
         }
 
         #endregion
-
-        private DataGridView dataGridView1;
         private Panel panel8;
         private Panel panel11;
         private ComboBox comboBox2;
@@ -226,8 +259,11 @@
         private Panel panel10;
         private ComboBox comboBox1;
         private Label label9;
-        private Panel panel1;
         private ReaLTaiizor.Controls.Button button4;
         private PictureBox pcbLoading;
+        private Panel panel2;
+        private Panel panel1;
+        private DataGridView dataGridView1;
+        private ReaLTaiizor.Controls.MaterialCheckBox ckbExpandSelection;
     }
 }

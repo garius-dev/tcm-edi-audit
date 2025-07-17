@@ -21,6 +21,7 @@ namespace tcm_edi_audit_core
 
         private AppSettingsLocal _localSettings;
         private List<EdiValidationResult> _validationResults;
+        private List<Models.DTOs.EdiValidationDisplayModel> _validationDisplayItems;
 
         public frmValidatorResult(List<EdiValidationResult> validationResults, AppSettingsLocal localSettings)
         {
@@ -28,9 +29,10 @@ namespace tcm_edi_audit_core
 
             _localSettings = localSettings ?? throw new ArgumentNullException(nameof(localSettings));
             _validationResults = validationResults ?? throw new ArgumentNullException(nameof(validationResults));
+            _validationDisplayItems = _validationResults.ToDisplayModel(ckbExpandSelection.Checked);
 
-            var xxx = _validationResults.ToDisplayModel(false);
-            var yyy = _validationResults.ToDisplayModel(true);
+            //var xxx = _validationResults.ToDisplayModel(false);
+            //var yyy = _validationResults.ToDisplayModel(true);
 
             //_resultsConsolidatedDGV = resultsDGV;
 
@@ -48,6 +50,15 @@ namespace tcm_edi_audit_core
 
         private void frmValidatorResult_Load(object sender, EventArgs e)
         {
+
+            dataGridView1.DataSource = new BindingSource { DataSource = _validationDisplayItems };
+            dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
+            dataGridView1.RowHeadersWidth = 35;
+            dataGridView1.ReadOnly = true;
+            dataGridView1.RowHeadersWidthSizeMode = DataGridViewRowHeadersWidthSizeMode.DisableResizing;
+
+            PopulateComboboxes();
+
             //dataGridView1.DataSource = _resultsDGV.OrderBy(o => o.Status).ToList();
 
             //dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
@@ -77,36 +88,66 @@ namespace tcm_edi_audit_core
             //comboBox2.DataSource = typeOfData;
         }
 
+        private void PopulateComboboxes()
+        {
+            var status = _validationDisplayItems
+                            .Select(s => s.Status)
+                            .Distinct()
+                            .OrderBy(c => c)
+                            .ToList();
+
+            status.Insert(0, "Todos");
+            comboBox1.DataSource = null;
+            comboBox1.DataSource = status;
+
+            var files = _validationDisplayItems
+                            .Select(s => s.FileName)
+                            .Distinct()
+                            .OrderBy(c => c)
+                            .ToList();
+
+            files.Insert(0, "Todos");
+            comboBox2.DataSource = null;
+            comboBox2.DataSource = files;
+        }
+
         private void ApplyCombinedFilters()
         {
-            //string lineCode = comboBox1.SelectedItem?.ToString();
-            //string fieldType = comboBox2.SelectedItem?.ToString();
 
-            //var filtered = _resultsDGV.AsEnumerable();
+            string status = comboBox1.SelectedItem?.ToString() ?? string.Empty;
+            string files = comboBox2.SelectedItem?.ToString() ?? string.Empty;
 
-            //if (!string.IsNullOrWhiteSpace(lineCode) && lineCode != "Todos")
-            //    filtered = filtered.Where(w => w.Status == lineCode);
+            var filtered = _validationDisplayItems.AsEnumerable();
 
-            //if (!string.IsNullOrWhiteSpace(fieldType) && fieldType != "Todos")
-            //    filtered = filtered.Where(w => w.FileName == fieldType);
+            if (!string.IsNullOrEmpty(status) && status != "Todos")
+                filtered = filtered.Where(w => w.Status == status);
 
-            //dataGridView1.DataSource = new BindingSource { DataSource = filtered.OrderBy(o => o.Status).ToList() };
+            if (!string.IsNullOrEmpty(files) && files != "Todos")
+                filtered = filtered.Where(w => w.FileName == files);
+
+            filtered = filtered.OrderBy(o => o.Status);
+
+
+            dataGridView1.DataSource = new BindingSource { DataSource = filtered };
         }
 
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            //comboBox2.DataSource = null;
 
-            //var typeOfData = _resultsDGV
-            //                .Where(w => w.Status == comboBox1.SelectedItem?.ToString() || comboBox1.SelectedItem?.ToString() == "Todos")
-            //                .Select(s => s.FileName)
-            //                .Distinct()
-            //                .OrderBy(c => c)
-            //                .ToList();
+            //var xxx = dataGridView1.DataSource;
 
-            //typeOfData.Insert(0, "Todos");
+            comboBox2.DataSource = null;
 
-            //comboBox2.DataSource = typeOfData;
+            var files = _validationDisplayItems
+                            .Where(w => w.Status == comboBox1.SelectedItem?.ToString() || comboBox1.SelectedItem?.ToString() == "Todos")
+                            .Select(s => s.FileName)
+                            .Distinct()
+                            .OrderBy(c => c)
+                            .ToList();
+
+            files.Insert(0, "Todos");
+
+            comboBox2.DataSource = files;
 
             //ApplyCombinedFilters();
         }
@@ -208,6 +249,20 @@ namespace tcm_edi_audit_core
             //        pcbLoading.Visible = false;
             //    }));
             //}
+        }
+
+        private void ckbExpandSelection_CheckedChanged(object sender, EventArgs e)
+        {
+            _validationDisplayItems = _validationResults.ToDisplayModel(ckbExpandSelection.Checked);
+
+            dataGridView1.DataSource = null;
+            dataGridView1.DataSource = new BindingSource { DataSource = _validationDisplayItems };
+            dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
+            dataGridView1.RowHeadersWidth = 35;
+            dataGridView1.ReadOnly = true;
+            dataGridView1.RowHeadersWidthSizeMode = DataGridViewRowHeadersWidthSizeMode.DisableResizing;
+
+            PopulateComboboxes();
         }
     }
 }

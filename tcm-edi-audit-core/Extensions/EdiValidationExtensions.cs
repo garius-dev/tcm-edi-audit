@@ -23,7 +23,7 @@ namespace tcm_edi_audit_core.Extensions
                     Message = s.Status == EdiValidationStatus.Sucess ?
                 "Sucesso!" : s.Status == EdiValidationStatus.Warning ? "Arquivo corrigido." : "Erro.",
                     Protocol = s.Protocol
-                }).OrderBy(o => o.Status).ToList();
+                }).OrderBy(o => o.Status).ThenBy(o => o.Protocol).ToList();
 
                 return ediValidationDisplayItems;
             }
@@ -79,7 +79,7 @@ namespace tcm_edi_audit_core.Extensions
                 }
             }
 
-            return ediValidationDisplayItems.OrderBy(o => o.Status).ToList();
+            return ediValidationDisplayItems.OrderBy(o => o.Status).ThenBy(o => o.Protocol).ToList();
         }
     }
 }
