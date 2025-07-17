@@ -39,6 +39,9 @@
             comboBox1 = new ComboBox();
             label9 = new Label();
             panel2 = new Panel();
+            lblSuccessCount = new Label();
+            lblWarningCount = new Label();
+            lblErrorCount = new Label();
             ckbExpandSelection = new ReaLTaiizor.Controls.MaterialCheckBox();
             panel1 = new Panel();
             dataGridView1 = new DataGridView();
@@ -173,6 +176,9 @@
             // 
             // panel2
             // 
+            panel2.Controls.Add(lblSuccessCount);
+            panel2.Controls.Add(lblWarningCount);
+            panel2.Controls.Add(lblErrorCount);
             panel2.Controls.Add(ckbExpandSelection);
             panel2.Dock = DockStyle.Bottom;
             panel2.Location = new Point(8, 430);
@@ -180,6 +186,48 @@
             panel2.Padding = new Padding(8);
             panel2.Size = new Size(837, 51);
             panel2.TabIndex = 3;
+            // 
+            // lblSuccessCount
+            // 
+            lblSuccessCount.Dock = DockStyle.Right;
+            lblSuccessCount.Font = new Font("Segoe UI", 16F, FontStyle.Bold);
+            lblSuccessCount.ForeColor = Color.FromArgb(40, 167, 69);
+            lblSuccessCount.Image = Properties.Resources.circle_green_16_16;
+            lblSuccessCount.ImageAlign = ContentAlignment.MiddleLeft;
+            lblSuccessCount.Location = new Point(529, 8);
+            lblSuccessCount.Name = "lblSuccessCount";
+            lblSuccessCount.Size = new Size(100, 35);
+            lblSuccessCount.TabIndex = 19;
+            lblSuccessCount.Text = "00";
+            lblSuccessCount.TextAlign = ContentAlignment.MiddleCenter;
+            // 
+            // lblWarningCount
+            // 
+            lblWarningCount.Dock = DockStyle.Right;
+            lblWarningCount.Font = new Font("Segoe UI", 16F, FontStyle.Bold);
+            lblWarningCount.ForeColor = Color.FromArgb(255, 193, 7);
+            lblWarningCount.Image = Properties.Resources.circle_yellow_16_16;
+            lblWarningCount.ImageAlign = ContentAlignment.MiddleLeft;
+            lblWarningCount.Location = new Point(629, 8);
+            lblWarningCount.Name = "lblWarningCount";
+            lblWarningCount.Size = new Size(100, 35);
+            lblWarningCount.TabIndex = 18;
+            lblWarningCount.Text = "00";
+            lblWarningCount.TextAlign = ContentAlignment.MiddleCenter;
+            // 
+            // lblErrorCount
+            // 
+            lblErrorCount.Dock = DockStyle.Right;
+            lblErrorCount.Font = new Font("Segoe UI", 16F, FontStyle.Bold);
+            lblErrorCount.ForeColor = Color.FromArgb(220, 53, 69);
+            lblErrorCount.Image = Properties.Resources.circle_red_16_16;
+            lblErrorCount.ImageAlign = ContentAlignment.MiddleLeft;
+            lblErrorCount.Location = new Point(729, 8);
+            lblErrorCount.Name = "lblErrorCount";
+            lblErrorCount.Size = new Size(100, 35);
+            lblErrorCount.TabIndex = 17;
+            lblErrorCount.Text = "00";
+            lblErrorCount.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // ckbExpandSelection
             // 
@@ -265,5 +313,8 @@
         private Panel panel1;
         private DataGridView dataGridView1;
         private ReaLTaiizor.Controls.MaterialCheckBox ckbExpandSelection;
+        private Label lblSuccessCount;
+        private Label lblWarningCount;
+        private Label lblErrorCount;
     }
 }

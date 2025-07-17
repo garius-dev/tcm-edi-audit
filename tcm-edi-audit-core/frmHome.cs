@@ -1,15 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Security.Principal;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using tcm_edi_audit_core.Extensions;
+﻿using tcm_edi_audit_core.Extensions;
 using tcm_edi_audit_core.Models.EDI;
 using tcm_edi_audit_core.Models.Settings;
 using tcm_edi_audit_core.Services;
@@ -19,12 +8,10 @@ namespace tcm_edi_audit_core
 {
     public partial class frmHome : Form
     {
-
         private ConfigManagerService _configManagerService;
         private AppSettings _settings;
         private AppSettingsLocal _localSettings;
         private FileManagerService _fileManagerService;
-
 
         public frmHome()
         {
@@ -38,12 +25,10 @@ namespace tcm_edi_audit_core
 
         private void panel1_Paint(object sender, PaintEventArgs e)
         {
-
         }
 
         private void panel2_MouseDown(object sender, MouseEventArgs e)
         {
-
         }
 
         private void button8_Click(object sender, EventArgs e)
@@ -53,12 +38,10 @@ namespace tcm_edi_audit_core
 
         private void button7_Click(object sender, EventArgs e)
         {
-
         }
 
         private void button5_Click(object sender, EventArgs e)
         {
-
         }
 
         private void button6_Click(object sender, EventArgs e)
@@ -68,7 +51,6 @@ namespace tcm_edi_audit_core
             {
                 // Aqui você pode adicionar lógica para lidar com a configuração, se necessário
             }
-
         }
 
         private async void frmHome_Load(object sender, EventArgs e)
@@ -147,7 +129,6 @@ namespace tcm_edi_audit_core
 
         private async void button4_Click(object sender, EventArgs e)
         {
-
             this.Invoke((MethodInvoker)(() =>
             {
                 button4.Enabled = false;
@@ -178,15 +159,10 @@ namespace tcm_edi_audit_core
                     pcbLoading.Visible = false;
                 }));
             }
-
-
-
-
         }
 
         private async Task<List<EdiValidationResult>> ValidateFiles(bool tryFixIt = false)
         {
-
             EdiParserService parser = new EdiParserService(_settings);
             EdiValidatorService validatorService = new EdiValidatorService(_settings);
             ExcelService excelService = new ExcelService();
@@ -212,90 +188,20 @@ namespace tcm_edi_audit_core
                             validatonResult.File = file;
                             validatonResult.Protocol = excelEntry.Protocol;
                             validatonResults.Add(validatonResult);
-
                         }
                     }
                     else
                     {
-                        //
+                        // No files found for the current invoice
                     }
                 }
             }
             else
             {
-                //
+                // No entries found in the Excel file
             }
 
             return validatonResults;
-
-            //List<EdiValidatorServiceResultDGV> finalResultsDGV = new List<EdiValidatorServiceResultDGV>();
-
-            //foreach (var result in results)
-            //{
-            //    EdiValidatorServiceResultDGV finalResultDGV = new EdiValidatorServiceResultDGV();
-            //    finalResultDGV.FileName = result.FileName;
-            //    finalResultDGV.FileNameFull = result.FileNameFull;
-            //    finalResultDGV.EdiLines = result.EdiLines;
-            //    finalResultDGV.ProtocolReference = result.ProtocolReference;
-
-            //    bool hasWarning = false;
-
-            //    foreach (var warning in result.Warnings)
-            //    {
-            //        hasWarning = true;
-
-            //        EdiValidatorServiceDGV ediValidator = new EdiValidatorServiceDGV();
-            //        ediValidator.StatusIcon = Properties.Resources.circle_yellow_16_16;
-            //        ediValidator.FileName = result.FileName;
-            //        ediValidator.Message = warning;
-            //        ediValidator.Status = "2 - Warning";
-            //        //ediValidator.EdiLines = result.EdiLines;
-            //        //resultsDGV.Add(ediValidator);
-            //        finalResultDGV.ResultItems.Add(ediValidator);
-
-            //        finalResultDGV.Status = "2 - Warning";
-            //        finalResultDGV.Message = "Corrigido.";
-
-            //    }
-
-            //    foreach (var erro in result.Errors)
-            //    {
-            //        EdiValidatorServiceDGV ediValidator = new EdiValidatorServiceDGV();
-            //        ediValidator.StatusIcon = Properties.Resources.circle_red_16_16;
-            //        ediValidator.FileName = result.FileName;
-            //        ediValidator.Message = erro;
-            //        ediValidator.Status = "3 - Error";
-            //        //ediValidator.EdiLines = result.EdiLines;
-            //        //resultsDGV.Add(ediValidator);
-            //        finalResultDGV.ResultItems.Add(ediValidator);
-
-            //        finalResultDGV.Status = "3 - Error";
-            //        finalResultDGV.Message = "Erro.";
-
-            //    }
-
-
-            //    if (result.Success)
-            //    {
-            //        EdiValidatorServiceDGV ediValidator = new EdiValidatorServiceDGV();
-            //        ediValidator.StatusIcon = Properties.Resources.circle_green_16_16;
-            //        ediValidator.FileName = result.FileName;
-            //        ediValidator.Message = "Sucesso!";
-            //        ediValidator.Status = "1 - Success";
-            //        //ediValidator.EdiLines = result.EdiLines;
-            //        //resultsDGV.Add(ediValidator);
-            //        finalResultDGV.ResultItems.Add(ediValidator);
-
-            //        finalResultDGV.Status = hasWarning ? "2 - Warning" :  "1 - Success";
-            //        finalResultDGV.Message = hasWarning ? "Corrigido." : "Sucesso!";
-            //    }
-
-            //    finalResultsDGV.Add(finalResultDGV);
-
-            //}
-
-            //return finalResultsDGV;
-
         }
 
         private void ckbFixIt_CheckedChanged(object sender, EventArgs e)

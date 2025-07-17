@@ -1,24 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
+﻿using System.Data;
 using tcm_edi_audit_core.Extensions;
 using tcm_edi_audit_core.Models.EDI;
 using tcm_edi_audit_core.Models.Settings;
-using tcm_edi_audit_core.Services;
 
 namespace tcm_edi_audit_core
 {
     public partial class frmValidatorResult : Form
     {
-        //private List<EdiValidatorServiceDGV> _resultsDGV;
-        //private List<EdiValidatorServiceResultDGV> _resultsConsolidatedDGV;
-
         private AppSettingsLocal _localSettings;
         private List<EdiValidationResult> _validationResults;
         private List<Models.DTOs.EdiValidationDisplayModel> _validationDisplayItems;
@@ -31,26 +19,13 @@ namespace tcm_edi_audit_core
             _validationResults = validationResults ?? throw new ArgumentNullException(nameof(validationResults));
             _validationDisplayItems = _validationResults.ToDisplayModel(ckbExpandSelection.Checked);
 
-            //var xxx = _validationResults.ToDisplayModel(false);
-            //var yyy = _validationResults.ToDisplayModel(true);
-
-            //_resultsConsolidatedDGV = resultsDGV;
-
-            //if (!_resultsConsolidatedDGV.IsNullOrEmpty())
-            //{
-            //    _resultsDGV = _resultsConsolidatedDGV.SelectMany(s => s.ResultItems).ToList();
-
-            //}
-            //else
-            //{
-            //    _resultsDGV = new List<EdiValidatorServiceDGV>();
-            //}
-
+            lblErrorCount.Text = _validationResults.Count(w => w.Status == EdiValidationStatus.Error).ToString("00");
+            lblWarningCount.Text = _validationResults.Count(w => w.Status == EdiValidationStatus.Warning).ToString("00");
+            lblSuccessCount.Text = _validationResults.Count(w => w.Status == EdiValidationStatus.Success).ToString("00");
         }
 
         private void frmValidatorResult_Load(object sender, EventArgs e)
         {
-
             dataGridView1.DataSource = new BindingSource { DataSource = _validationDisplayItems };
             dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
             dataGridView1.RowHeadersWidth = 35;
@@ -58,34 +33,6 @@ namespace tcm_edi_audit_core
             dataGridView1.RowHeadersWidthSizeMode = DataGridViewRowHeadersWidthSizeMode.DisableResizing;
 
             PopulateComboboxes();
-
-            //dataGridView1.DataSource = _resultsDGV.OrderBy(o => o.Status).ToList();
-
-            //dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
-            //dataGridView1.RowHeadersWidth = 35;
-            //dataGridView1.ReadOnly = true;
-            //dataGridView1.RowHeadersWidthSizeMode = DataGridViewRowHeadersWidthSizeMode.DisableResizing;
-
-            //var codes = _resultsDGV
-            //                .Select(s => s.Status)
-            //                .Distinct()
-            //                .OrderBy(c => c)
-            //                .ToList();
-
-            //codes.Insert(0, "Todos");
-
-            //comboBox1.DataSource = codes;
-
-
-            //var typeOfData = _resultsDGV
-            //                .Select(s => s.FileName)
-            //                .Distinct()
-            //                .OrderBy(c => c)
-            //                .ToList();
-
-            //typeOfData.Insert(0, "Todos");
-
-            //comboBox2.DataSource = typeOfData;
         }
 
         private void PopulateComboboxes()
@@ -113,7 +60,6 @@ namespace tcm_edi_audit_core
 
         private void ApplyCombinedFilters()
         {
-
             string status = comboBox1.SelectedItem?.ToString() ?? string.Empty;
             string files = comboBox2.SelectedItem?.ToString() ?? string.Empty;
 
@@ -127,15 +73,11 @@ namespace tcm_edi_audit_core
 
             filtered = filtered.OrderByPriority();
 
-
             dataGridView1.DataSource = new BindingSource { DataSource = filtered };
         }
 
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
-
-            //var xxx = dataGridView1.DataSource;
-
             comboBox2.DataSource = null;
 
             var files = _validationDisplayItems
@@ -148,14 +90,11 @@ namespace tcm_edi_audit_core
             files.Insert(0, "Todos");
 
             comboBox2.DataSource = files;
-
-            //ApplyCombinedFilters();
         }
 
         private void comboBox2_SelectedIndexChanged(object sender, EventArgs e)
         {
             ApplyCombinedFilters();
-
         }
 
         private void SaveFiles()
@@ -194,7 +133,6 @@ namespace tcm_edi_audit_core
                             FileExtensions.DeleteFileIfExists(Path.Combine(outputResultFolderPath, item.File.Name));
                         }
                     }
-
                 }
             }
             else
@@ -219,7 +157,6 @@ namespace tcm_edi_audit_core
             {
                 await Task.Run(() => SaveFiles());
                 MessageBox.Show("Arquivos salvos com sucesso!", "Sucesso", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
             }
             catch (Exception ex)
             {

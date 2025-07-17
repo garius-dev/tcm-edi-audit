@@ -10,11 +10,11 @@
     
     <ApplicationHighDpiMode>SystemAware</ApplicationHighDpiMode>
     <ForceDesignerDpiUnaware>true</ForceDesignerDpiUnaware>
-    <ApplicationIcon>favicon (1).ico</ApplicationIcon>
+    <ApplicationIcon>favicon-tcm-audit.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="favicon (1).ico" />
+    <Content Include="favicon-tcm-audit.ico" />
   </ItemGroup>
 
   <ItemGroup>
