@@ -27,6 +27,37 @@ namespace tcm_edi_audit_core.Extensions
             }
         }
 
+        public static void DeleteFileIfExists(string path)
+        {
+            if (string.IsNullOrWhiteSpace(path))
+                throw new ArgumentException("O caminho do arquivo não pode ser nulo ou vazio.", nameof(path));
+
+            try
+            {
+                if (File.Exists(path))
+                {
+                    File.Delete(path);
+                    Console.WriteLine("Arquivo excluído com sucesso.");
+                }
+                else
+                {
+                    Console.WriteLine("O arquivo não existe. Nenhuma ação foi necessária.");
+                }
+            }
+            catch (UnauthorizedAccessException)
+            {
+                Console.WriteLine("Erro: Permissão negada para excluir o arquivo.");
+            }
+            catch (IOException ex)
+            {
+                Console.WriteLine($"Erro de E/S ao excluir o arquivo: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Erro inesperado ao excluir o arquivo: {ex.Message}");
+            }
+        }
+
         public static void CreateOrReplaceFile(string path, string content)
         {
             if (string.IsNullOrWhiteSpace(path))

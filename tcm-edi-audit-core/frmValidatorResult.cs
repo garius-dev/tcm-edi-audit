@@ -152,6 +152,10 @@ namespace tcm_edi_audit_core
                             {
                                 FileExtensions.CopyFileReplacingIfExists(item.FileNameFull, folderNew);
                             }
+                            else
+                            {
+                                FileExtensions.DeleteFileIfExists(Path.Combine(folderNew, item.FileName));
+                            }
                         }
                     }
                 }
