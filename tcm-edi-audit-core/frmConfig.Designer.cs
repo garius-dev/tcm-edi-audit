@@ -58,6 +58,11 @@
             dgvCodeDefinitions = new DataGridView();
             label11 = new Label();
             panel13 = new Panel();
+            tabAdmin = new TabPage();
+            panel14 = new Panel();
+            dgvAdmins = new DataGridView();
+            label12 = new Label();
+            panel15 = new Panel();
             panel4 = new Panel();
             button2 = new ReaLTaiizor.Controls.Button();
             label5 = new Label();
@@ -92,6 +97,9 @@
             tabPage3.SuspendLayout();
             panel12.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvCodeDefinitions).BeginInit();
+            tabAdmin.SuspendLayout();
+            panel14.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)dgvAdmins).BeginInit();
             panel4.SuspendLayout();
             panel2.SuspendLayout();
             panel3.SuspendLayout();
@@ -118,6 +126,7 @@
             metroTabControl1.Controls.Add(tabPage1);
             metroTabControl1.Controls.Add(tabPage2);
             metroTabControl1.Controls.Add(tabPage3);
+            metroTabControl1.Controls.Add(tabAdmin);
             metroTabControl1.ControlsVisible = true;
             metroTabControl1.Dock = DockStyle.Fill;
             metroTabControl1.IsDerivedStyle = true;
@@ -472,6 +481,65 @@
             panel13.Size = new Size(860, 16);
             panel13.TabIndex = 2;
             // 
+            // tabAdmin
+            // 
+            tabAdmin.Controls.Add(panel14);
+            tabAdmin.Controls.Add(panel15);
+            tabAdmin.Location = new Point(4, 42);
+            tabAdmin.Name = "tabAdmin";
+            tabAdmin.Padding = new Padding(3);
+            tabAdmin.Size = new Size(866, 426);
+            tabAdmin.TabIndex = 3;
+            tabAdmin.Text = "Administradores";
+            tabAdmin.UseVisualStyleBackColor = true;
+            // 
+            // panel14
+            // 
+            panel14.BackColor = Color.Transparent;
+            panel14.Controls.Add(dgvAdmins);
+            panel14.Controls.Add(label12);
+            panel14.Dock = DockStyle.Fill;
+            panel14.Location = new Point(3, 19);
+            panel14.Margin = new Padding(0);
+            panel14.Name = "panel14";
+            panel14.Padding = new Padding(8);
+            panel14.Size = new Size(860, 404);
+            panel14.TabIndex = 5;
+            // 
+            // dgvAdmins
+            // 
+            dgvAdmins.BorderStyle = BorderStyle.None;
+            dgvAdmins.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dgvAdmins.Dock = DockStyle.Left;
+            dgvAdmins.Location = new Point(8, 37);
+            dgvAdmins.Name = "dgvAdmins";
+            dgvAdmins.Size = new Size(349, 359);
+            dgvAdmins.TabIndex = 4;
+            // 
+            // label12
+            // 
+            label12.AutoSize = true;
+            label12.Dock = DockStyle.Top;
+            label12.Font = new Font("Microsoft Sans Serif", 10.2F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            label12.ForeColor = Color.FromArgb(64, 64, 64);
+            label12.Location = new Point(8, 8);
+            label12.Margin = new Padding(0);
+            label12.Name = "label12";
+            label12.Padding = new Padding(0, 6, 6, 6);
+            label12.Size = new Size(136, 29);
+            label12.TabIndex = 3;
+            label12.Text = "Administradores:";
+            // 
+            // panel15
+            // 
+            panel15.Dock = DockStyle.Top;
+            panel15.Location = new Point(3, 3);
+            panel15.Margin = new Padding(0);
+            panel15.Name = "panel15";
+            panel15.Padding = new Padding(8, 8, 8, 0);
+            panel15.Size = new Size(860, 16);
+            panel15.TabIndex = 4;
+            // 
             // panel4
             // 
             panel4.Controls.Add(button2);
@@ -684,6 +752,7 @@
             BackColor = Color.FromArgb(46, 80, 159);
             ClientSize = new Size(890, 622);
             Controls.Add(panel1);
+            Icon = (Icon)resources.GetObject("$this.Icon");
             Name = "frmConfig";
             Padding = new Padding(8);
             ShowIcon = false;
@@ -716,6 +785,10 @@
             panel12.ResumeLayout(false);
             panel12.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)dgvCodeDefinitions).EndInit();
+            tabAdmin.ResumeLayout(false);
+            panel14.ResumeLayout(false);
+            panel14.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)dgvAdmins).EndInit();
             panel4.ResumeLayout(false);
             panel2.ResumeLayout(false);
             panel3.ResumeLayout(false);
@@ -768,5 +841,10 @@
         private Panel panel13;
         private DataGridView dgvCodeDefinitions;
         private Label label11;
+        private TabPage tabAdmin;
+        private Panel panel14;
+        private DataGridView dgvAdmins;
+        private Label label12;
+        private Panel panel15;
     }
 }

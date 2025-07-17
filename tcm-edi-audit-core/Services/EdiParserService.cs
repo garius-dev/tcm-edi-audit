@@ -92,7 +92,9 @@ namespace tcm_edi_audit_core.Services
                         continue;
                     }
 
+                    column.FieldDefinitionRule = field;
                     column.Success = true;
+                    ediLine.LineLenght = lineCodeConfig.MinLen;
                     ediLine.Columns.Add(column);
                 }
 

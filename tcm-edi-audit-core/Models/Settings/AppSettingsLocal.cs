@@ -11,5 +11,6 @@ namespace tcm_edi_audit_core.Models.Settings
         public string SourceFolderPath { get; set; }
         public string ReferenceExcelFilePath { get; set; }
         public string OutputFolderPath { get; set; }
+        public bool TryFixIt { get; set; }
     }
 }

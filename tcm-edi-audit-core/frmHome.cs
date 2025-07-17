@@ -5,6 +5,7 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -72,12 +73,22 @@ namespace tcm_edi_audit_core
 
         private async void frmHome_Load(object sender, EventArgs e)
         {
+            var currentUser = Environment.UserName;
+
             _settings = await _configManagerService.LoadSettingsFromCloud();
             _localSettings = _configManagerService.LoadSettings();
+
+            if (!_settings.AdminUsers.Any(a => a.UserAccount == Environment.UserName))
+            {
+                button6.Enabled = false;
+                button6.InactiveColor = System.Drawing.Color.FromArgb(194, 194, 194);
+                button6.BorderColor = System.Drawing.Color.FromArgb(194, 194, 194);
+            }
 
             txtFolderPath.Text = _localSettings.SourceFolderPath;
             txtExcelPath.Text = _localSettings.ReferenceExcelFilePath;
             txtOutputPath.Text = _localSettings.OutputFolderPath;
+            ckbFixIt.Checked = _localSettings.TryFixIt;
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -148,9 +159,9 @@ namespace tcm_edi_audit_core
 
             try
             {
-                var filesValidated = await Task.Run(() => ValidateFiles());
+                var filesValidated = await Task.Run(() => ValidateFiles(_localSettings.TryFixIt));
 
-                frmValidatorResult frmValidatorResult = new frmValidatorResult(filesValidated);
+                frmValidatorResult frmValidatorResult = new frmValidatorResult(filesValidated, _localSettings);
 
                 this.Invoke((MethodInvoker)(() =>
                 {
@@ -180,7 +191,7 @@ namespace tcm_edi_audit_core
 
         }
 
-        private async Task<List<EdiValidatorServiceDGV>> ValidateFiles()
+        private async Task<List<EdiValidatorServiceResultDGV>> ValidateFiles(bool tryFixIt = false)
         {
 
             EdiParserService parser = new EdiParserService(_settings);
@@ -204,8 +215,11 @@ namespace tcm_edi_audit_core
                         var parseResult = parser.ParseFile(lines);
                         if (parseResult.Success)
                         {
-                            var result = validatorService.Validate(parseResult.Lines, protocolReferences, protocol.Invoice);
+                            var result = validatorService.Validate(parseResult.Lines, protocolReferences, protocol.Invoice, tryFixIt);
                             result.FileName = fileNameShort.Name;
+                            result.FileNameFull = fileNameShort.FullName;
+                            result.ProtocolReference = protocol.Protocol;
+
                             results.Add(result);
                         }
 
@@ -215,8 +229,36 @@ namespace tcm_edi_audit_core
 
             List<EdiValidatorServiceDGV> resultsDGV = new List<EdiValidatorServiceDGV>();
 
+            List<EdiValidatorServiceResultDGV> finalResultsDGV = new List<EdiValidatorServiceResultDGV>();
+
             foreach (var result in results)
             {
+                EdiValidatorServiceResultDGV finalResultDGV = new EdiValidatorServiceResultDGV();
+                finalResultDGV.FileName = result.FileName;
+                finalResultDGV.FileNameFull = result.FileNameFull;
+                finalResultDGV.EdiLines = result.EdiLines;
+                finalResultDGV.ProtocolReference = result.ProtocolReference;
+
+                bool hasWarning = false;
+
+                foreach (var warning in result.Warnings)
+                {
+                    hasWarning = true;
+
+                    EdiValidatorServiceDGV ediValidator = new EdiValidatorServiceDGV();
+                    ediValidator.StatusIcon = Properties.Resources.circle_yellow_16_16;
+                    ediValidator.FileName = result.FileName;
+                    ediValidator.Message = warning;
+                    ediValidator.Status = "2 - Warning";
+                    //ediValidator.EdiLines = result.EdiLines;
+                    //resultsDGV.Add(ediValidator);
+                    finalResultDGV.ResultItems.Add(ediValidator);
+
+                    finalResultDGV.Status = "2 - Warning";
+                    finalResultDGV.Message = "Corrigido.";
+
+                }
+
                 foreach (var erro in result.Errors)
                 {
                     EdiValidatorServiceDGV ediValidator = new EdiValidatorServiceDGV();
@@ -224,18 +266,15 @@ namespace tcm_edi_audit_core
                     ediValidator.FileName = result.FileName;
                     ediValidator.Message = erro;
                     ediValidator.Status = "3 - Error";
-                    resultsDGV.Add(ediValidator);
+                    //ediValidator.EdiLines = result.EdiLines;
+                    //resultsDGV.Add(ediValidator);
+                    finalResultDGV.ResultItems.Add(ediValidator);
+
+                    finalResultDGV.Status = "3 - Error";
+                    finalResultDGV.Message = "Erro.";
+
                 }
 
-                foreach (var warning in result.Warnings)
-                {
-                    EdiValidatorServiceDGV ediValidator = new EdiValidatorServiceDGV();
-                    ediValidator.StatusIcon = Properties.Resources.circle_yellow_16_16;
-                    ediValidator.FileName = result.FileName;
-                    ediValidator.Message = warning;
-                    ediValidator.Status = "2 - Warning";
-                    resultsDGV.Add(ediValidator);
-                }
 
                 if (result.Success)
                 {
@@ -244,13 +283,26 @@ namespace tcm_edi_audit_core
                     ediValidator.FileName = result.FileName;
                     ediValidator.Message = "Sucesso!";
                     ediValidator.Status = "1 - Success";
-                    resultsDGV.Add(ediValidator);
+                    //ediValidator.EdiLines = result.EdiLines;
+                    //resultsDGV.Add(ediValidator);
+                    finalResultDGV.ResultItems.Add(ediValidator);
+
+                    finalResultDGV.Status = hasWarning ? "2 - Warning" :  "1 - Success";
+                    finalResultDGV.Message = hasWarning ? "Corrigido." : "Sucesso!";
                 }
+
+                finalResultsDGV.Add(finalResultDGV);
 
             }
 
-            return resultsDGV;
+            return finalResultsDGV;
 
+        }
+
+        private void ckbFixIt_CheckedChanged(object sender, EventArgs e)
+        {
+            _localSettings.TryFixIt = ckbFixIt.Checked;
+            _configManagerService.SaveSettings(_localSettings);
         }
     }
 }

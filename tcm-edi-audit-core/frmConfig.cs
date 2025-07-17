@@ -59,12 +59,22 @@ namespace tcm_edi_audit_core
         {
             _settings = await _configManagerService.LoadSettingsFromCloud();
 
-            _settings = await _configManagerService.LoadSettingsFromCloud();
+            if (!_settings.AdminUsers.Any(a => a.UserAccount == Environment.UserName))
+            {
+                MessageBox.Show("Você não tem permissão para acessar as configurações.", "Acesso Negado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                this.Close();
+                return;
+            }
+
+            _settings.EdiFieldDefinitions = _settings.EdiFieldDefinitions.OrderBy(o => o.LineCode).ThenBy(o => o.ColumnId).ToList();
+            _settings.AdminUsers = _settings.AdminUsers.OrderBy(o => o.UserName).ToList();
 
             dgvVehicles.DataSource = new BindingSource { DataSource = _settings.Vehicles };
             dgvBranches.DataSource = new BindingSource { DataSource = _settings.Branches };
             dgvCollections.DataSource = new BindingSource { DataSource = _settings.CollectTypes };
-            dgvEdiFieldValidationSettings.DataSource = new BindingSource { DataSource = _settings.EdiFieldDefinitions.OrderBy(o => o.LineCode).ThenBy(o => o.ColumnId).ToList() };
+            dgvEdiFieldValidationSettings.DataSource = new BindingSource { DataSource = _settings.EdiFieldDefinitions };
+
+            dgvAdmins.DataSource = new BindingSource { DataSource = _settings.AdminUsers };
 
             dgvCodeDefinitions.DataSource = new BindingSource { DataSource = _settings.EdiLineCodeDefinitions };
 
@@ -86,6 +96,10 @@ namespace tcm_edi_audit_core
             dgvEdiFieldValidationSettings.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
             dgvEdiFieldValidationSettings.RowHeadersWidth = 35;
             dgvEdiFieldValidationSettings.RowHeadersWidthSizeMode = DataGridViewRowHeadersWidthSizeMode.DisableResizing;
+
+            dgvAdmins.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            dgvAdmins.RowHeadersWidth = 35;
+            dgvAdmins.RowHeadersWidthSizeMode = DataGridViewRowHeadersWidthSizeMode.DisableResizing;
 
             dgvCodeDefinitions.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             dgvCodeDefinitions.RowHeadersWidth = 35;

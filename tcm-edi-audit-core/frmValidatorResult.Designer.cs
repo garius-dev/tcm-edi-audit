@@ -28,8 +28,11 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmValidatorResult));
             dataGridView1 = new DataGridView();
             panel8 = new Panel();
+            button4 = new ReaLTaiizor.Controls.Button();
+            pcbLoading = new PictureBox();
             panel11 = new Panel();
             comboBox2 = new ComboBox();
             label10 = new Label();
@@ -39,6 +42,7 @@
             panel1 = new Panel();
             ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
             panel8.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)pcbLoading).BeginInit();
             panel11.SuspendLayout();
             panel10.SuspendLayout();
             panel1.SuspendLayout();
@@ -59,6 +63,8 @@
             // 
             // panel8
             // 
+            panel8.Controls.Add(button4);
+            panel8.Controls.Add(pcbLoading);
             panel8.Controls.Add(panel11);
             panel8.Controls.Add(panel10);
             panel8.Dock = DockStyle.Top;
@@ -68,6 +74,40 @@
             panel8.Padding = new Padding(8, 8, 8, 0);
             panel8.Size = new Size(784, 72);
             panel8.TabIndex = 1;
+            // 
+            // button4
+            // 
+            button4.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            button4.BackColor = Color.Transparent;
+            button4.BorderColor = Color.FromArgb(40, 167, 69);
+            button4.Cursor = Cursors.Hand;
+            button4.EnteredBorderColor = Color.FromArgb(30, 126, 52);
+            button4.EnteredColor = Color.FromArgb(33, 136, 56);
+            button4.Font = new Font("Microsoft Sans Serif", 12F);
+            button4.Image = null;
+            button4.ImageAlign = ContentAlignment.MiddleLeft;
+            button4.InactiveColor = Color.FromArgb(40, 167, 69);
+            button4.Location = new Point(653, 37);
+            button4.Name = "button4";
+            button4.PressedBorderColor = Color.FromArgb(28, 116, 48);
+            button4.PressedColor = Color.FromArgb(30, 126, 52);
+            button4.Size = new Size(123, 28);
+            button4.TabIndex = 13;
+            button4.Text = "SALVAR";
+            button4.TextAlignment = StringAlignment.Center;
+            button4.Click += button4_Click;
+            // 
+            // pcbLoading
+            // 
+            pcbLoading.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            pcbLoading.Image = Properties.Resources.loading_35;
+            pcbLoading.Location = new Point(549, 39);
+            pcbLoading.Name = "pcbLoading";
+            pcbLoading.Size = new Size(168, 25);
+            pcbLoading.SizeMode = PictureBoxSizeMode.Zoom;
+            pcbLoading.TabIndex = 14;
+            pcbLoading.TabStop = false;
+            pcbLoading.Visible = false;
             // 
             // panel11
             // 
@@ -153,11 +193,13 @@
             // 
             // frmValidatorResult
             // 
-            AutoScaleDimensions = new SizeF(7F, 15F);
-            AutoScaleMode = AutoScaleMode.Font;
+            AutoScaleDimensions = new SizeF(96F, 96F);
+            AutoScaleMode = AutoScaleMode.Dpi;
+            BackColor = Color.White;
             ClientSize = new Size(800, 450);
             Controls.Add(panel1);
             Controls.Add(panel8);
+            Icon = (Icon)resources.GetObject("$this.Icon");
             Name = "frmValidatorResult";
             Padding = new Padding(8);
             StartPosition = FormStartPosition.CenterScreen;
@@ -165,6 +207,7 @@
             Load += frmValidatorResult_Load;
             ((System.ComponentModel.ISupportInitialize)dataGridView1).EndInit();
             panel8.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)pcbLoading).EndInit();
             panel11.ResumeLayout(false);
             panel11.PerformLayout();
             panel10.ResumeLayout(false);
@@ -184,5 +227,7 @@
         private ComboBox comboBox1;
         private Label label9;
         private Panel panel1;
+        private ReaLTaiizor.Controls.Button button4;
+        private PictureBox pcbLoading;
     }
 }

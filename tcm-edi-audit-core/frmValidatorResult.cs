@@ -7,6 +7,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using tcm_edi_audit_core.Extensions;
+using tcm_edi_audit_core.Models.EDI;
+using tcm_edi_audit_core.Models.Settings;
 using tcm_edi_audit_core.Services;
 
 namespace tcm_edi_audit_core
@@ -14,10 +17,27 @@ namespace tcm_edi_audit_core
     public partial class frmValidatorResult : Form
     {
         private List<EdiValidatorServiceDGV> _resultsDGV;
-        public frmValidatorResult(List<EdiValidatorServiceDGV> resultsDGV)
+        private List<EdiValidatorServiceResultDGV> _resultsConsolidatedDGV;
+
+        private AppSettingsLocal _settings;
+
+        public frmValidatorResult(List<EdiValidatorServiceResultDGV> resultsDGV, AppSettingsLocal settings)
         {
             InitializeComponent();
-            _resultsDGV = resultsDGV;
+
+            _settings = settings ?? throw new ArgumentNullException(nameof(settings));
+            _resultsConsolidatedDGV = resultsDGV;
+
+            if (!_resultsConsolidatedDGV.IsNullOrEmpty())
+            {
+                _resultsDGV = _resultsConsolidatedDGV.SelectMany(s => s.ResultItems).ToList();
+
+            }
+            else
+            {
+                _resultsDGV = new List<EdiValidatorServiceDGV>();
+            }
+
         }
 
         private void frmValidatorResult_Load(object sender, EventArgs e)
@@ -89,6 +109,95 @@ namespace tcm_edi_audit_core
         {
             ApplyCombinedFilters();
 
+        }
+
+        private void SaveFiles()
+        {
+            if (!_resultsConsolidatedDGV.IsNullOrEmpty())
+            {
+
+                var protocolGroup = _resultsConsolidatedDGV.GroupBy(g => new { g.ProtocolReference })
+                    .Select(s => new
+                    {
+                        Protocol = s.Key.ProtocolReference,
+                        Items = s.ToList()
+                    }).ToList();
+
+                string dateString = DateTime.Now.ToString("yyyy-MM-dd");
+
+                foreach (var protocolItem in protocolGroup)
+                {
+                    var statusGroup = protocolItem.Items.GroupBy(g => new { g.Status })
+                        .Select(s => new
+                        {
+                            Status = s.Key.Status,
+                            Items = s.ToList()
+                        }).ToList();
+
+                    foreach (var statusItem in statusGroup)
+                    {
+
+                        foreach (var item in statusItem.Items)
+                        {
+                            var folderNew = Path.Combine(_settings.OutputFolderPath, dateString, item.ProtocolReference);
+                            FileExtensions.CheckOrCreateFolder(folderNew);
+
+                            if (item.Status.StartsWith("2"))
+                            {
+                                var fixedFile = item.EdiLines.ToStringBuild();
+                                FileExtensions.CreateOrReplaceFile(Path.Combine(folderNew, item.FileName), fixedFile);
+
+                            }
+                            else if (item.Status.StartsWith("1"))
+                            {
+                                FileExtensions.CopyFileReplacingIfExists(item.FileNameFull, folderNew);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        private async void button4_Click(object sender, EventArgs e)
+        {
+            this.Invoke((MethodInvoker)(() =>
+            {
+                button4.Enabled = false;
+                button4.Text = "Salvando...";
+                pcbLoading.Visible = true;
+            }));
+
+            await Task.Delay(1);
+
+            try
+            {
+                await Task.Run(() => SaveFiles());
+
+
+                this.Invoke((MethodInvoker)(() =>
+                {
+                    button4.Text = "SALVAR";
+                    button4.Enabled = true;
+                    pcbLoading.Visible = false;
+                }));
+
+                MessageBox.Show("Arquivos salvos com sucesso!", "Sucesso", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erro: {ex.Message}");
+            }
+            finally
+            {
+                this.Invoke((MethodInvoker)(() =>
+                {
+                    button4.Text = "SALVAR";
+                    button4.Enabled = true;
+                    pcbLoading.Visible = false;
+                }));
+            }
         }
     }
 }

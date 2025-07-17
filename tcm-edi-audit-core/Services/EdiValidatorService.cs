@@ -17,6 +17,26 @@ namespace tcm_edi_audit_core.Services
         public string Message { get; set; }
     }
 
+    public class EdiValidatorServiceResultDGV
+    {
+        public Image StatusIcon { get; set; }
+        public string FileName { get; set; } = string.Empty;
+        public string FileNameFull { get; set; } = string.Empty;
+        public string ProtocolReference { get; set; } = string.Empty;
+        public string Message { get; set; } = string.Empty;
+
+        [Browsable(false)]
+        public string Status { get; set; }
+
+
+        [Browsable(false)]
+        public List<EdiValidatorServiceDGV> ResultItems { get; set; } = new List<EdiValidatorServiceDGV>();
+
+
+        [Browsable(false)]
+        public List<EdiLine> EdiLines { get; set; } = new List<EdiLine>();
+    }
+
     public class EdiValidatorService
     {
         private readonly AppSettings _settings;
@@ -37,6 +57,8 @@ namespace tcm_edi_audit_core.Services
             ValidateBranchInformation(ediLines, result, tryFixIt);
             ValidateCollectRequestCode(ediLines, excelData, invoiceNumber, result, tryFixIt);
             ValidateInvoiceTotalRevenue(ediLines, excelData, invoiceNumber, result, tryFixIt);
+
+            result.EdiLines = ediLines;
 
             return result;
         }

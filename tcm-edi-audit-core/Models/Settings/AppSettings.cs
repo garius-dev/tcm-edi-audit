@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -7,12 +8,19 @@ using tcm_edi_audit_core.Models.EDI.Settings;
 
 namespace tcm_edi_audit_core.Models.Settings
 {
+
+    public class UserSetting
+    {
+        [DisplayName("Nome")]
+        public string UserName { get; set; }
+
+        [DisplayName("Windows User Name")]
+        public string UserAccount { get; set; }
+    }
     
     public class AppSettings
     {
-        public string SourceFolderPath { get; set; }
-        public string ReferenceExcelFilePath { get; set; }
-        public string OutputFolderPath { get; set; }
+        public List<UserSetting> AdminUsers { get; set; } = new List<UserSetting>();
 
         public List<VehicleSettings> Vehicles { get; set; }
         public List<BranchSettings> Branches { get; set; }

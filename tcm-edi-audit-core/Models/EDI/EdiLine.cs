@@ -14,5 +14,6 @@ namespace tcm_edi_audit_core.Models.EDI
         public string ErrorMessage { get; set; } = string.Empty;
 
         public List<EdiColumn> Columns { get; set; } = new List<EdiColumn>();
+        public int LineLenght { get; set; }
     }
 }

@@ -30,6 +30,7 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmHome));
             panel1 = new Panel();
+            ckbFixIt = new ReaLTaiizor.Controls.MaterialCheckBox();
             button4 = new ReaLTaiizor.Controls.Button();
             pcbLoading = new PictureBox();
             panel7 = new Panel();
@@ -63,6 +64,7 @@
             // panel1
             // 
             panel1.BackColor = Color.White;
+            panel1.Controls.Add(ckbFixIt);
             panel1.Controls.Add(button4);
             panel1.Controls.Add(pcbLoading);
             panel1.Controls.Add(panel7);
@@ -77,6 +79,24 @@
             panel1.TabIndex = 0;
             panel1.Paint += panel1_Paint;
             // 
+            // ckbFixIt
+            // 
+            ckbFixIt.AutoSize = true;
+            ckbFixIt.Depth = 0;
+            ckbFixIt.Location = new Point(22, 363);
+            ckbFixIt.Margin = new Padding(0);
+            ckbFixIt.MouseLocation = new Point(-1, -1);
+            ckbFixIt.MouseState = ReaLTaiizor.Helper.MaterialDrawHelper.MaterialMouseState.HOVER;
+            ckbFixIt.Name = "ckbFixIt";
+            ckbFixIt.ReadOnly = false;
+            ckbFixIt.Ripple = true;
+            ckbFixIt.Size = new Size(280, 37);
+            ckbFixIt.TabIndex = 14;
+            ckbFixIt.Text = "Corrigir arquivos automaticamente";
+            ckbFixIt.UseAccentColor = false;
+            ckbFixIt.UseVisualStyleBackColor = true;
+            ckbFixIt.CheckedChanged += ckbFixIt_CheckedChanged;
+            // 
             // button4
             // 
             button4.BackColor = Color.Transparent;
@@ -88,7 +108,7 @@
             button4.Image = null;
             button4.ImageAlign = ContentAlignment.MiddleLeft;
             button4.InactiveColor = Color.FromArgb(40, 167, 69);
-            button4.Location = new Point(421, 363);
+            button4.Location = new Point(421, 362);
             button4.Name = "button4";
             button4.PressedBorderColor = Color.FromArgb(28, 116, 48);
             button4.PressedColor = Color.FromArgb(30, 126, 52);
@@ -101,7 +121,7 @@
             // pcbLoading
             // 
             pcbLoading.Image = Properties.Resources.loading_35;
-            pcbLoading.Location = new Point(313, 370);
+            pcbLoading.Location = new Point(313, 369);
             pcbLoading.Name = "pcbLoading";
             pcbLoading.Size = new Size(168, 25);
             pcbLoading.SizeMode = PictureBoxSizeMode.Zoom;
@@ -298,10 +318,10 @@
             // 
             panel3.Controls.Add(button6);
             panel3.Dock = DockStyle.Right;
-            panel3.Location = new Point(333, 8);
+            panel3.Location = new Point(483, 8);
             panel3.Name = "panel3";
             panel3.Padding = new Padding(14);
-            panel3.Size = new Size(255, 64);
+            panel3.Size = new Size(105, 64);
             panel3.TabIndex = 1;
             // 
             // button6
@@ -316,7 +336,7 @@
             button6.Image = (Image)resources.GetObject("button6.Image");
             button6.ImageAlign = ContentAlignment.MiddleCenter;
             button6.InactiveColor = Color.FromArgb(0, 123, 255);
-            button6.Location = new Point(205, 14);
+            button6.Location = new Point(55, 14);
             button6.Name = "button6";
             button6.PressedBorderColor = Color.FromArgb(0, 92, 191);
             button6.PressedColor = Color.FromArgb(0, 98, 204);
@@ -343,6 +363,7 @@
             BackColor = Color.FromArgb(46, 80, 159);
             ClientSize = new Size(612, 432);
             Controls.Add(panel1);
+            Icon = (Icon)resources.GetObject("$this.Icon");
             MaximizeBox = false;
             Name = "frmHome";
             Padding = new Padding(8);
@@ -351,6 +372,7 @@
             Text = "EDI AUDIT - Home";
             Load += frmHome_Load;
             panel1.ResumeLayout(false);
+            panel1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)pcbLoading).EndInit();
             panel7.ResumeLayout(false);
             panel7.PerformLayout();
@@ -387,5 +409,6 @@
         private Label label2;
         private ReaLTaiizor.Controls.Button button4;
         private PictureBox pcbLoading;
+        private ReaLTaiizor.Controls.MaterialCheckBox ckbFixIt;
     }
 }
