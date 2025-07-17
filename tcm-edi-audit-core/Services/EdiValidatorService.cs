@@ -1,7 +1,10 @@
-﻿using System;
+﻿using DocumentFormat.OpenXml.Vml;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Data.Common;
 using System.Linq;
+using tcm_edi_audit_core.Extensions;
 using tcm_edi_audit_core.Models.DTOs;
 using tcm_edi_audit_core.Models.EDI;
 using tcm_edi_audit_core.Models.EDI.Settings;
@@ -18,19 +21,25 @@ namespace tcm_edi_audit_core.Services
             _settings = settings;
         }
 
-        
+
         // Adicionado o parâmetro opcional 'tryFixIt' para habilitar a autocorreção.
-        public EdiValidationResult Validate(List<EdiLine> ediLines, List<ExcelEntry> excelData, string invoiceNumber, bool tryFixIt = false)
+        public EdiValidationResult Validate(EdiParseResult ediParseResult, List<ExcelEntry> excelData, string invoiceNumber, bool tryFixIt = false)
         {
             var result = new EdiValidationResult();
 
-            ValidateVehicleCodes(ediLines, result);
-            ValidateCollectTypeCodes(ediLines, result);
-            ValidateBranchInformation(ediLines, result, tryFixIt);
-            ValidateCollectRequestCode(ediLines, excelData, invoiceNumber, result, tryFixIt);
-            ValidateInvoiceTotalRevenue(ediLines, excelData, invoiceNumber, result, tryFixIt);
+            bool parseValidationResult = ValidateParsedLines(ediParseResult, result);
+            //
 
-            result.EdiLines = ediLines;
+            if (parseValidationResult)
+            {
+                ValidateVehicleCodes(ediParseResult.Lines, result);
+                ValidateCollectTypeCodes(ediParseResult.Lines, result);
+                ValidateBranchInformation(ediParseResult.Lines, result, tryFixIt);
+                ValidateCollectRequestCode(ediParseResult.Lines, excelData, invoiceNumber, result, tryFixIt);
+                ValidateInvoiceTotalRevenue(ediParseResult.Lines, excelData, invoiceNumber, result, tryFixIt);
+            }            
+
+            result.EdiLines = ediParseResult.Lines;
 
             if (result.Errors.Count > 0)
             {
@@ -44,11 +53,43 @@ namespace tcm_edi_audit_core.Services
             }
             else
             {
-                result.Status = EdiValidationStatus.Sucess;
+                result.Status = EdiValidationStatus.Success;
                 result.StatusIcon = Properties.Resources.circle_green_16_16;
             }
 
             return result;
+        }
+
+        private bool ValidateParsedLines(EdiParseResult ediParseResult, EdiValidationResult result)
+        {
+            if (!ediParseResult.Success)
+            {
+                foreach (var ediLine in ediParseResult.Lines)
+                {
+                    if (!ediLine.Success)
+                    {
+                        if (!ediLine.Columns.IsNullOrEmpty())
+                        {
+                            foreach (var ediColumn in ediLine.Columns)
+                            {
+                                if (!ediColumn.Success)
+                                {
+                                    result.Errors.Add($"Linha {ediLine.Id} ({ediLine.Code}), Coluna {ediColumn.Id} ({ediColumn.FieldDefinitionRule?.FieldName ?? "NA"}): {ediColumn.ErrorMessage}");
+                                }
+                            }
+                        }
+                        else
+                        {
+                            result.Errors.Add($"Linha {ediLine.Id} ({(string.IsNullOrEmpty(ediLine.Code) ? "NA" : ediLine.Code)}): {ediLine.ErrorMessage}");
+                        }
+
+                    }
+                }
+
+                return false;
+            }
+
+            return true;
         }
 
         private void ValidateVehicleCodes(List<EdiLine> lines, EdiValidationResult result)

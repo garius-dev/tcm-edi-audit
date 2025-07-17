@@ -45,6 +45,7 @@ namespace tcm_edi_audit_core.Services
 
                 if (lineCodeConfig == null)
                 {
+                    ediLine.Code = lineCode;
                     ediLine.ErrorMessage = $"Código '{lineCode}' não possui configuração definida.";
                     result.Errors.Add($"Linha {i}: {ediLine.ErrorMessage}");
                     result.Lines.Add(ediLine);
@@ -53,6 +54,7 @@ namespace tcm_edi_audit_core.Services
 
                 if (fieldConfigs == null || !fieldConfigs.Any())
                 {
+                    ediLine.Code = lineCode;
                     ediLine.ErrorMessage = $"Configuração de colunas não encontrada para código '{lineCode}'.";
                     result.Errors.Add($"Linha {i}: {ediLine.ErrorMessage}");
                     result.Lines.Add(ediLine);
@@ -61,7 +63,8 @@ namespace tcm_edi_audit_core.Services
 
                 if (lines[i].Length < lineCodeConfig.MinLen || lines[i].Length > lineCodeConfig.MaxLen)
                 {
-                    ediLine.ErrorMessage = $"Tamanho da linha fora do intervalo esperado para código '{lineCode}' ({lines[i].Length} caracteres).";
+                    ediLine.Code = lineCode;
+                    ediLine.ErrorMessage = $"Tamanho da linha fora do intervalo esperado para código '{lineCode}' (esperado {lineCodeConfig.MaxLen}, obtido {lines[i].Length}).";
                     result.Errors.Add($"Linha {i}: {ediLine.ErrorMessage}");
                     result.Lines.Add(ediLine);
                     continue;

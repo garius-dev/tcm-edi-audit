@@ -8,7 +8,7 @@ namespace tcm_edi_audit_core.Models.EDI
 {
     public enum EdiValidationStatus
     {
-        Sucess = 0,
+        Success = 0,
         Warning = 1,
         Error = 2,
     }

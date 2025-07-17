@@ -125,7 +125,7 @@ namespace tcm_edi_audit_core
             if (!string.IsNullOrEmpty(files) && files != "Todos")
                 filtered = filtered.Where(w => w.FileName == files);
 
-            filtered = filtered.OrderBy(o => o.Status);
+            filtered = filtered.OrderByPriority();
 
 
             dataGridView1.DataSource = new BindingSource { DataSource = filtered };

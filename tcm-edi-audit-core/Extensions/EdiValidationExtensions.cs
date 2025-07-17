@@ -10,9 +10,24 @@ namespace tcm_edi_audit_core.Extensions
 {
     public static class EdiValidationExtensions
     {
+        private static readonly Dictionary<string, int> priorityOrder = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase)
+            {
+                { "Success", 0 },
+                { "Error",    1 },
+                { "Warning", 2 }
+            };
+
+        public static List<EdiValidationDisplayModel> OrderByPriority(this IEnumerable<EdiValidationDisplayModel> items)
+        {
+            return items
+                .OrderBy(o => priorityOrder.ContainsKey(o.Status) ? priorityOrder[o.Status] : int.MaxValue)
+                .ThenBy(o => o.Protocol)
+                .ToList();
+        }
+
         public static List<EdiValidationDisplayModel> ToDisplayModel(this List<EdiValidationResult> validationResult, bool expandSelection = false)
         {
-
+            
             if (!expandSelection)
             {
                 var ediValidationDisplayItems = validationResult.Select(s => new EdiValidationDisplayModel
@@ -20,20 +35,20 @@ namespace tcm_edi_audit_core.Extensions
                     Status = s.Status.ToString(),
                     StatusIcon = s.StatusIcon,
                     FileName = s.File?.Name ?? "",
-                    Message = s.Status == EdiValidationStatus.Sucess ?
-                "Sucesso!" : s.Status == EdiValidationStatus.Warning ? "Arquivo corrigido." : "Erro.",
+                    Message = s.Status == EdiValidationStatus.Success ?
+                "Sucesso!" : s.Status == EdiValidationStatus.Warning ? "Arquivo corrigido." : "Erro (expanda a seleção para mais detalhes)",
                     Protocol = s.Protocol
-                }).OrderBy(o => o.Status).ThenBy(o => o.Protocol).ToList();
+                }).OrderByPriority();
 
                 return ediValidationDisplayItems;
             }
             else
             {
-                return FlatItems(validationResult);
+                return FlattenItems(validationResult);
             }
         }
 
-        private static List<EdiValidationDisplayModel> FlatItems(List<EdiValidationResult> validationResults)
+        private static List<EdiValidationDisplayModel> FlattenItems(List<EdiValidationResult> validationResults)
         {
             List<EdiValidationDisplayModel> ediValidationDisplayItems = new List<EdiValidationDisplayModel>();
 
@@ -65,7 +80,7 @@ namespace tcm_edi_audit_core.Extensions
                         });
                     }
 
-                    if(validationResult.Status == EdiValidationStatus.Sucess)
+                    if(validationResult.Status == EdiValidationStatus.Success)
                     {
                         ediValidationDisplayItems.Add(new EdiValidationDisplayModel()
                         {
@@ -79,7 +94,7 @@ namespace tcm_edi_audit_core.Extensions
                 }
             }
 
-            return ediValidationDisplayItems.OrderBy(o => o.Status).ThenBy(o => o.Protocol).ToList();
+            return ediValidationDisplayItems.OrderByPriority();
         }
     }
 }

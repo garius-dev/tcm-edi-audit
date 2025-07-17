@@ -207,13 +207,11 @@ namespace tcm_edi_audit_core
                             var lines = await _fileManagerService.ReadEdiFileAsync(file.FullName);
 
                             var parseResult = parser.ParseFile(lines);
-                            if (parseResult.Success)
-                            {
-                                EdiValidationResult validatonResult = validatorService.Validate(parseResult.Lines, excelEntries, excelEntry.Invoice, tryFixIt);
-                                validatonResult.File = file;
-                                validatonResult.Protocol = excelEntry.Protocol;
-                                validatonResults.Add(validatonResult);
-                            }
+
+                            EdiValidationResult validatonResult = validatorService.Validate(parseResult, excelEntries, excelEntry.Invoice, tryFixIt);
+                            validatonResult.File = file;
+                            validatonResult.Protocol = excelEntry.Protocol;
+                            validatonResults.Add(validatonResult);
 
                         }
                     }
