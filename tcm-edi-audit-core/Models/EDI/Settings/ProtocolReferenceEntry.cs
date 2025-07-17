@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace tcm_edi_audit_core.Models.EDI.Settings
 {
-    public class ProtocolReferenceEntry
+    public class ExcelEntry
     {
         public string Flow { get; set; }
         public string State { get; set; }

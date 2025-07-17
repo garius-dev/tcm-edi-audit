@@ -2,41 +2,13 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using tcm_edi_audit_core.Models.DTOs;
 using tcm_edi_audit_core.Models.EDI;
 using tcm_edi_audit_core.Models.EDI.Settings;
 using tcm_edi_audit_core.Models.Settings;
 
 namespace tcm_edi_audit_core.Services
 {
-    public class EdiValidatorServiceDGV
-    {
-        [Browsable(false)]
-        public string Status { get; set; }
-        public Image StatusIcon { get; set; }
-        public string FileName { get; set; }
-        public string Message { get; set; }
-    }
-
-    public class EdiValidatorServiceResultDGV
-    {
-        public Image StatusIcon { get; set; }
-        public string FileName { get; set; } = string.Empty;
-        public string FileNameFull { get; set; } = string.Empty;
-        public string ProtocolReference { get; set; } = string.Empty;
-        public string Message { get; set; } = string.Empty;
-
-        [Browsable(false)]
-        public string Status { get; set; }
-
-
-        [Browsable(false)]
-        public List<EdiValidatorServiceDGV> ResultItems { get; set; } = new List<EdiValidatorServiceDGV>();
-
-
-        [Browsable(false)]
-        public List<EdiLine> EdiLines { get; set; } = new List<EdiLine>();
-    }
-
     public class EdiValidatorService
     {
         private readonly AppSettings _settings;
@@ -46,19 +18,35 @@ namespace tcm_edi_audit_core.Services
             _settings = settings;
         }
 
+        
         // Adicionado o parâmetro opcional 'tryFixIt' para habilitar a autocorreção.
-        public EdiValidationResult Validate(List<EdiLine> ediLines, List<ProtocolReferenceEntry> excelData, string invoiceNumber, bool tryFixIt = false)
+        public EdiValidationResult Validate(List<EdiLine> ediLines, List<ExcelEntry> excelData, string invoiceNumber, bool tryFixIt = false)
         {
             var result = new EdiValidationResult();
 
             ValidateVehicleCodes(ediLines, result);
             ValidateCollectTypeCodes(ediLines, result);
-            // Passando o parâmetro 'tryFixIt' para os métodos que suportam correção.
             ValidateBranchInformation(ediLines, result, tryFixIt);
             ValidateCollectRequestCode(ediLines, excelData, invoiceNumber, result, tryFixIt);
             ValidateInvoiceTotalRevenue(ediLines, excelData, invoiceNumber, result, tryFixIt);
 
             result.EdiLines = ediLines;
+
+            if (result.Errors.Count > 0)
+            {
+                result.Status = EdiValidationStatus.Error;
+                result.StatusIcon = Properties.Resources.circle_red_16_16;
+            }
+            else if (result.Warnings.Count > 0)
+            {
+                result.Status = EdiValidationStatus.Warning;
+                result.StatusIcon = Properties.Resources.circle_yellow_16_16;
+            }
+            else
+            {
+                result.Status = EdiValidationStatus.Sucess;
+                result.StatusIcon = Properties.Resources.circle_green_16_16;
+            }
 
             return result;
         }
@@ -189,7 +177,7 @@ namespace tcm_edi_audit_core.Services
         }
 
         // Adicionado o parâmetro 'tryFixIt' para a lógica de correção.
-        private void ValidateCollectRequestCode(List<EdiLine> ediLines, List<ProtocolReferenceEntry> excelData, string invoiceNumber, EdiValidationResult result, bool tryFixIt)
+        private void ValidateCollectRequestCode(List<EdiLine> ediLines, List<ExcelEntry> excelData, string invoiceNumber, EdiValidationResult result, bool tryFixIt)
         {
             var lines329 = ediLines.Where(l => l.Code == "329").ToList();
             if (!lines329.Any())
@@ -269,7 +257,7 @@ namespace tcm_edi_audit_core.Services
         }
 
         // Adicionado o parâmetro 'tryFixIt' para a lógica de correção.
-        private void ValidateInvoiceTotalRevenue(List<EdiLine> ediLines, List<ProtocolReferenceEntry> excelData, string invoiceNumber, EdiValidationResult result, bool tryFixIt)
+        private void ValidateInvoiceTotalRevenue(List<EdiLine> ediLines, List<ExcelEntry> excelData, string invoiceNumber, EdiValidationResult result, bool tryFixIt)
         {
             var totalFromExcel = excelData
                 .Where(r => r.Invoice == invoiceNumber)

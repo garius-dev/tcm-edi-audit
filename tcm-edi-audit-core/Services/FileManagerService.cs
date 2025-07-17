@@ -43,7 +43,7 @@ namespace tcm_edi_audit_core.Services
 
 
 
-        public List<string> GetEdiFiles(string folderPath, string prefix = null, string suffix = null)
+        public List<FileInfo> GetEdiFiles(string folderPath, string? prefix = null, string? suffix = null)
         {
             if (string.IsNullOrWhiteSpace(folderPath))
                 throw new ArgumentException("O caminho da pasta não pode ser nulo ou vazio.", nameof(folderPath));
@@ -51,17 +51,21 @@ namespace tcm_edi_audit_core.Services
             if (!Directory.Exists(folderPath))
                 throw new DirectoryNotFoundException($"A pasta '{folderPath}' não existe.");
 
-            var files = Directory.GetFiles(folderPath, "*.txt");
+            var directory = new DirectoryInfo(folderPath);
 
-            return files.Where(file =>
-            {
-                var name = Path.GetFileNameWithoutExtension(file);
+            var files = directory.GetFiles("*.txt");
 
-                bool matchesPrefix = string.IsNullOrEmpty(prefix) || name.StartsWith(prefix, StringComparison.OrdinalIgnoreCase);
-                bool matchesSuffix = string.IsNullOrEmpty(suffix) || name.EndsWith(suffix, StringComparison.OrdinalIgnoreCase);
+            return files
+                .Where(file =>
+                {
+                    var name = Path.GetFileNameWithoutExtension(file.Name);
 
-                return matchesPrefix && matchesSuffix;
-            }).ToList();
+                    bool matchesPrefix = string.IsNullOrEmpty(prefix) || name.StartsWith(prefix, StringComparison.OrdinalIgnoreCase);
+                    bool matchesSuffix = string.IsNullOrEmpty(suffix) || name.EndsWith(suffix, StringComparison.OrdinalIgnoreCase);
+
+                    return matchesPrefix && matchesSuffix;
+                })
+                .ToList();
         }
     }
 }

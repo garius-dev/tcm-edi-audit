@@ -163,13 +163,6 @@ namespace tcm_edi_audit_core
 
                 frmValidatorResult frmValidatorResult = new frmValidatorResult(filesValidated, _localSettings);
 
-                this.Invoke((MethodInvoker)(() =>
-                {
-                    button4.Text = "AUDITAR";
-                    button4.Enabled = true;
-                    pcbLoading.Visible = false;
-                }));
-
                 frmValidatorResult.ShowDialog();
             }
             catch (Exception ex)
@@ -191,111 +184,119 @@ namespace tcm_edi_audit_core
 
         }
 
-        private async Task<List<EdiValidatorServiceResultDGV>> ValidateFiles(bool tryFixIt = false)
+        private async Task<List<EdiValidationResult>> ValidateFiles(bool tryFixIt = false)
         {
 
             EdiParserService parser = new EdiParserService(_settings);
             EdiValidatorService validatorService = new EdiValidatorService(_settings);
-            ProtocolReferenceLoader protocolReferenceLoader = new ProtocolReferenceLoader();
-            List<EdiValidationResult> results = new List<EdiValidationResult>();
+            ExcelService excelService = new ExcelService();
+            List<EdiValidationResult> validatonResults = new List<EdiValidationResult>();
 
-            var protocolReferences = protocolReferenceLoader.LoadFromExcel(_localSettings.ReferenceExcelFilePath);
+            var excelEntries = excelService.Load(_localSettings.ReferenceExcelFilePath);
 
-            if (!protocolReferences.IsNullOrEmpty())
+            if (!excelEntries.IsNullOrEmpty())
             {
-                foreach (var protocol in protocolReferences)
+                foreach (var excelEntry in excelEntries)
                 {
-                    var files = _fileManagerService.GetEdiFiles(_localSettings.SourceFolderPath, null, $"_{protocol.Invoice}");
+                    var files = _fileManagerService.GetEdiFiles(_localSettings.SourceFolderPath, null, $"_{excelEntry.Invoice}");
 
-                    foreach (var file in files)
+                    if (!files.IsNullOrEmpty())
                     {
-                        var fileNameShort = new System.IO.FileInfo(file);
-
-                        var lines = await _fileManagerService.ReadEdiFileAsync(file);
-                        var parseResult = parser.ParseFile(lines);
-                        if (parseResult.Success)
+                        foreach (var file in files)
                         {
-                            var result = validatorService.Validate(parseResult.Lines, protocolReferences, protocol.Invoice, tryFixIt);
-                            result.FileName = fileNameShort.Name;
-                            result.FileNameFull = fileNameShort.FullName;
-                            result.ProtocolReference = protocol.Protocol;
+                            var lines = await _fileManagerService.ReadEdiFileAsync(file.FullName);
 
-                            results.Add(result);
+                            var parseResult = parser.ParseFile(lines);
+                            if (parseResult.Success)
+                            {
+                                EdiValidationResult validatonResult = validatorService.Validate(parseResult.Lines, excelEntries, excelEntry.Invoice, tryFixIt);
+                                validatonResult.File = file;
+                                validatonResult.Protocol = excelEntry.Protocol;
+                                validatonResults.Add(validatonResult);
+                            }
+
                         }
-
+                    }
+                    else
+                    {
+                        //
                     }
                 }
             }
-
-            List<EdiValidatorServiceDGV> resultsDGV = new List<EdiValidatorServiceDGV>();
-
-            List<EdiValidatorServiceResultDGV> finalResultsDGV = new List<EdiValidatorServiceResultDGV>();
-
-            foreach (var result in results)
+            else
             {
-                EdiValidatorServiceResultDGV finalResultDGV = new EdiValidatorServiceResultDGV();
-                finalResultDGV.FileName = result.FileName;
-                finalResultDGV.FileNameFull = result.FileNameFull;
-                finalResultDGV.EdiLines = result.EdiLines;
-                finalResultDGV.ProtocolReference = result.ProtocolReference;
-
-                bool hasWarning = false;
-
-                foreach (var warning in result.Warnings)
-                {
-                    hasWarning = true;
-
-                    EdiValidatorServiceDGV ediValidator = new EdiValidatorServiceDGV();
-                    ediValidator.StatusIcon = Properties.Resources.circle_yellow_16_16;
-                    ediValidator.FileName = result.FileName;
-                    ediValidator.Message = warning;
-                    ediValidator.Status = "2 - Warning";
-                    //ediValidator.EdiLines = result.EdiLines;
-                    //resultsDGV.Add(ediValidator);
-                    finalResultDGV.ResultItems.Add(ediValidator);
-
-                    finalResultDGV.Status = "2 - Warning";
-                    finalResultDGV.Message = "Corrigido.";
-
-                }
-
-                foreach (var erro in result.Errors)
-                {
-                    EdiValidatorServiceDGV ediValidator = new EdiValidatorServiceDGV();
-                    ediValidator.StatusIcon = Properties.Resources.circle_red_16_16;
-                    ediValidator.FileName = result.FileName;
-                    ediValidator.Message = erro;
-                    ediValidator.Status = "3 - Error";
-                    //ediValidator.EdiLines = result.EdiLines;
-                    //resultsDGV.Add(ediValidator);
-                    finalResultDGV.ResultItems.Add(ediValidator);
-
-                    finalResultDGV.Status = "3 - Error";
-                    finalResultDGV.Message = "Erro.";
-
-                }
-
-
-                if (result.Success)
-                {
-                    EdiValidatorServiceDGV ediValidator = new EdiValidatorServiceDGV();
-                    ediValidator.StatusIcon = Properties.Resources.circle_green_16_16;
-                    ediValidator.FileName = result.FileName;
-                    ediValidator.Message = "Sucesso!";
-                    ediValidator.Status = "1 - Success";
-                    //ediValidator.EdiLines = result.EdiLines;
-                    //resultsDGV.Add(ediValidator);
-                    finalResultDGV.ResultItems.Add(ediValidator);
-
-                    finalResultDGV.Status = hasWarning ? "2 - Warning" :  "1 - Success";
-                    finalResultDGV.Message = hasWarning ? "Corrigido." : "Sucesso!";
-                }
-
-                finalResultsDGV.Add(finalResultDGV);
-
+                //
             }
 
-            return finalResultsDGV;
+            return validatonResults;
+
+            //List<EdiValidatorServiceResultDGV> finalResultsDGV = new List<EdiValidatorServiceResultDGV>();
+
+            //foreach (var result in results)
+            //{
+            //    EdiValidatorServiceResultDGV finalResultDGV = new EdiValidatorServiceResultDGV();
+            //    finalResultDGV.FileName = result.FileName;
+            //    finalResultDGV.FileNameFull = result.FileNameFull;
+            //    finalResultDGV.EdiLines = result.EdiLines;
+            //    finalResultDGV.ProtocolReference = result.ProtocolReference;
+
+            //    bool hasWarning = false;
+
+            //    foreach (var warning in result.Warnings)
+            //    {
+            //        hasWarning = true;
+
+            //        EdiValidatorServiceDGV ediValidator = new EdiValidatorServiceDGV();
+            //        ediValidator.StatusIcon = Properties.Resources.circle_yellow_16_16;
+            //        ediValidator.FileName = result.FileName;
+            //        ediValidator.Message = warning;
+            //        ediValidator.Status = "2 - Warning";
+            //        //ediValidator.EdiLines = result.EdiLines;
+            //        //resultsDGV.Add(ediValidator);
+            //        finalResultDGV.ResultItems.Add(ediValidator);
+
+            //        finalResultDGV.Status = "2 - Warning";
+            //        finalResultDGV.Message = "Corrigido.";
+
+            //    }
+
+            //    foreach (var erro in result.Errors)
+            //    {
+            //        EdiValidatorServiceDGV ediValidator = new EdiValidatorServiceDGV();
+            //        ediValidator.StatusIcon = Properties.Resources.circle_red_16_16;
+            //        ediValidator.FileName = result.FileName;
+            //        ediValidator.Message = erro;
+            //        ediValidator.Status = "3 - Error";
+            //        //ediValidator.EdiLines = result.EdiLines;
+            //        //resultsDGV.Add(ediValidator);
+            //        finalResultDGV.ResultItems.Add(ediValidator);
+
+            //        finalResultDGV.Status = "3 - Error";
+            //        finalResultDGV.Message = "Erro.";
+
+            //    }
+
+
+            //    if (result.Success)
+            //    {
+            //        EdiValidatorServiceDGV ediValidator = new EdiValidatorServiceDGV();
+            //        ediValidator.StatusIcon = Properties.Resources.circle_green_16_16;
+            //        ediValidator.FileName = result.FileName;
+            //        ediValidator.Message = "Sucesso!";
+            //        ediValidator.Status = "1 - Success";
+            //        //ediValidator.EdiLines = result.EdiLines;
+            //        //resultsDGV.Add(ediValidator);
+            //        finalResultDGV.ResultItems.Add(ediValidator);
+
+            //        finalResultDGV.Status = hasWarning ? "2 - Warning" :  "1 - Success";
+            //        finalResultDGV.Message = hasWarning ? "Corrigido." : "Sucesso!";
+            //    }
+
+            //    finalResultsDGV.Add(finalResultDGV);
+
+            //}
+
+            //return finalResultsDGV;
 
         }
 

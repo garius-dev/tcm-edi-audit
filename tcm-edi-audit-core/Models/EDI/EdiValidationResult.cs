@@ -6,15 +6,21 @@ using System.Threading.Tasks;
 
 namespace tcm_edi_audit_core.Models.EDI
 {
+    public enum EdiValidationStatus
+    {
+        Sucess = 0,
+        Warning = 1,
+        Error = 2,
+    }
+
     public class EdiValidationResult
     {
-        public string ProtocolReference { get; set; }
-        public string FileName { get; set; }
-        public string FileNameFull { get; set; }
+        public EdiValidationStatus Status { get; set; }
+        public Image? StatusIcon { get; set; }
+        public FileInfo? File { get; set; }
+        public string Protocol { get; set; } = string.Empty;
         public List<string> Errors { get; set; } = new List<string>();
         public List<string> Warnings { get; set; } = new List<string>();
-        public List<EdiLine> EdiLines { get; set; }
-        public bool Success => !Errors.Any();
-        public bool Warning => !Warnings.Any();
+        public List<EdiLine> EdiLines { get; set; } = new List<EdiLine>();
     }
 }

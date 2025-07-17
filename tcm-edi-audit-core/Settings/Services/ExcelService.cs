@@ -10,11 +10,11 @@ using tcm_edi_audit_core.Models.EDI.Settings;
 
 namespace tcm_edi_audit_core.Settings.Services
 {
-    public class ProtocolReferenceLoader
+    public class ExcelService
     {
-        public List<ProtocolReferenceEntry> LoadFromExcel(string filePath)
+        public List<ExcelEntry> Load(string filePath)
         {
-            var records = new List<ProtocolReferenceEntry>();
+            var records = new List<ExcelEntry>();
 
             string tempFilePath = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}{Path.GetExtension(filePath)}");
             File.Copy(filePath, tempFilePath, overwrite: true);
@@ -28,7 +28,7 @@ namespace tcm_edi_audit_core.Settings.Services
 
                     foreach (var row in rows)
                     {
-                        records.Add(new ProtocolReferenceEntry
+                        records.Add(new ExcelEntry
                         {
                             Flow = row.Cell(1).GetString(),
                             State = row.Cell(2).GetString(),
