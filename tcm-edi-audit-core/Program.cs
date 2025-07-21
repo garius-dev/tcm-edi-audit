@@ -11,7 +11,15 @@ namespace tcm_edi_audit_core
             // To customize application configuration such as set high DPI settings or default font,
             // see https://aka.ms/applicationconfiguration.
             ApplicationConfiguration.Initialize();
-            Application.Run(new frmHome());
+
+            var splash = new frmPreLoading();
+            splash.Show();
+            splash.Refresh();
+
+            var mainForm = new frmHome();
+            mainForm.Load += (s, e) => splash.Close();
+
+            Application.Run(mainForm);
         }
     }
 }

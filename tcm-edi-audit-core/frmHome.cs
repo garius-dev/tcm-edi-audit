@@ -12,7 +12,8 @@ namespace tcm_edi_audit_core
         private AppSettings _settings;
         private AppSettingsLocal _localSettings;
         private FileManagerService _fileManagerService;
-
+        private List<Models.EDI.Settings.ExcelEntry> _excelEntries;
+        private ExcelService _excelService;
         public frmHome()
         {
             InitializeComponent();
@@ -21,6 +22,8 @@ namespace tcm_edi_audit_core
             _settings = new AppSettings();
             _localSettings = new AppSettingsLocal();
             _fileManagerService = new FileManagerService();
+            _excelService = new ExcelService();
+            _excelEntries = new List<Models.EDI.Settings.ExcelEntry>();
         }
 
         private void panel1_Paint(object sender, PaintEventArgs e)
@@ -55,6 +58,8 @@ namespace tcm_edi_audit_core
 
         private async void frmHome_Load(object sender, EventArgs e)
         {
+            
+
             var currentUser = Environment.UserName;
 
             _settings = await _configManagerService.LoadSettingsFromCloud();
@@ -71,6 +76,14 @@ namespace tcm_edi_audit_core
             txtExcelPath.Text = _localSettings.ReferenceExcelFilePath;
             txtOutputPath.Text = _localSettings.OutputFolderPath;
             ckbFixIt.Checked = _localSettings.TryFixIt;
+
+            ValidatePreConfig();
+            TryLoadExcelFile();
+        }
+
+        private void ValidatePreConfig()
+        {
+            button4.Enabled = !string.IsNullOrEmpty(txtFolderPath.Text) && !string.IsNullOrEmpty(txtExcelPath.Text) && !string.IsNullOrEmpty(txtExcelPath.Text);
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -89,6 +102,8 @@ namespace tcm_edi_audit_core
                 _localSettings.SourceFolderPath = selectedPath;
                 _configManagerService.SaveSettings(_localSettings);
             }
+
+            ValidatePreConfig();
         }
 
         private void button2_Click(object sender, EventArgs e)
@@ -105,8 +120,36 @@ namespace tcm_edi_audit_core
 
                     _localSettings.ReferenceExcelFilePath = selectedFile;
                     _configManagerService.SaveSettings(_localSettings);
+
+                    TryLoadExcelFile(true);
                 }
             }
+
+            ValidatePreConfig();
+        }
+
+        private void TryLoadExcelFile(bool preView = false)
+        {
+            if (!string.IsNullOrEmpty(txtExcelPath.Text))
+            {
+                try
+                {
+                    _excelEntries = _excelService.Load(_localSettings.ReferenceExcelFilePath);
+                    if (preView)
+                    {
+                        frmExcelEntries frmExcelEntries = new frmExcelEntries(_excelEntries);
+                        frmExcelEntries.ShowDialog();
+                    }
+
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Impossível validar o arquivo excel.", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    txtExcelPath.Text = string.Empty;
+                }
+            }
+
+            
         }
 
         private void button3_Click(object sender, EventArgs e)
@@ -125,6 +168,8 @@ namespace tcm_edi_audit_core
                 _localSettings.OutputFolderPath = selectedPath;
                 _configManagerService.SaveSettings(_localSettings);
             }
+
+            ValidatePreConfig();
         }
 
         private async void button4_Click(object sender, EventArgs e)
@@ -168,7 +213,7 @@ namespace tcm_edi_audit_core
             ExcelService excelService = new ExcelService();
             List<EdiValidationResult> validatonResults = new List<EdiValidationResult>();
 
-            var excelEntries = excelService.Load(_localSettings.ReferenceExcelFilePath);
+            List<Models.EDI.Settings.ExcelEntry> excelEntries = _excelEntries;
 
             if (!excelEntries.IsNullOrEmpty())
             {

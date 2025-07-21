@@ -102,6 +102,7 @@
             button4.BackColor = Color.Transparent;
             button4.BorderColor = Color.FromArgb(40, 167, 69);
             button4.Cursor = Cursors.Hand;
+            button4.Enabled = false;
             button4.EnteredBorderColor = Color.FromArgb(30, 126, 52);
             button4.EnteredColor = Color.FromArgb(33, 136, 56);
             button4.Font = new Font("Microsoft Sans Serif", 12F);

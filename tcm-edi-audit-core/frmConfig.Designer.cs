@@ -262,9 +262,9 @@
             label7.Margin = new Padding(0);
             label7.Name = "label7";
             label7.Padding = new Padding(0, 6, 6, 6);
-            label7.Size = new Size(123, 29);
+            label7.Size = new Size(57, 29);
             label7.TabIndex = 1;
-            label7.Text = "Tipo de coleta:";
+            label7.Text = "Fluxo:";
             // 
             // panel5
             // 
